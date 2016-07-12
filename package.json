@@ -1,0 +1,29 @@
+{
+  "name": "Web-book",
+  "version": "1.0.0",
+  "description": "mise en page style e-book",
+  "main": "dist/webBook.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nagajurna/Web-book"
+  },
+  "keywords": [
+    "e-book",
+    "js",
+    "columns"
+  ],
+  "author": "nagajurna",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nagajurna/Web-book/issues"
+  },
+  "homepage": "https://github.com/nagajurna/Web-book",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1"
+  }
+}
