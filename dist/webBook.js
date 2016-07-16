@@ -201,6 +201,8 @@ Book.prototype.getMarginY = function() {
 
 Book.prototype.forward = function() {
 	'use strict';
+	console.log(this.lastElement.offsetLeft+this.position);
+	console.log(this.containerWidth+this.getMarginX());
 	if(this.lastElement.offsetLeft+this.position > this.containerWidth+this.getMarginX()) {
 		this.position -= this.containerWidth;
 		this.text.style.left = this.position+"px";
