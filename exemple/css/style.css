@@ -1,10 +1,16 @@
 #bookContainer {
 	font-family: 'Georgia', serif;
-	font-size: 12pt;
+	font-size: 11pt;
 	position: relative;
 	max-width: 520px;
 	margin: auto;
 	background-color: #FAEBD7;
+}
+
+@media screen and (min-width: 520px) {
+    #bookContainer {
+        font-size: 12pt;
+    }
 }
 
 #textContainer {

@@ -20,7 +20,7 @@ window.addEventListener('load', function() {
 		 height: h,
 		 width: 520, 
 		 marginX: 35,
-		 marginY: 20})
+		 marginY: 20});
 		 
 	//on resize
 	window.addEventListener('resize',function(event) {
