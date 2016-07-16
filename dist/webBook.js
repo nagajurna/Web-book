@@ -97,7 +97,7 @@ Book.prototype.toBook = function() {
 		ts.columnWidth = this.containerWidth + "px";
 		ts.MozColumnGap = this.getMarginX()*2 + "px";
 		ts.WebkitColumnGap = this.getMarginX()*2 + "px";
-		ts.ColumnGap = this.getMarginX()*2 + "px";
+		ts.columnGap = this.getMarginX()*2 + "px";
 		//position
 		if('MozColumnWidth' in document.body.style) {//hack firefox (pour resize et insertion el-page-number) : overflow = visible 
 			cs.overflow = "visible";
