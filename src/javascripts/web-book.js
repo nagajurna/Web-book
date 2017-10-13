@@ -29,8 +29,10 @@ class WebBook {
 		this._breaks = this._text.querySelectorAll('.wb-text-break');
 		//elements : select all elements but .text-breaks (for bookmarks)
 		this._elements = this._text.querySelectorAll(':not(.wb-text-break)');
-		//toc-items
-		this._tocItems = this._textContainer.querySelectorAll('.wb-toc-item');
+		//toc
+		this._toc = this._bookContainer.querySelector('[data-wb-toc]');
+		//toc-inserts
+		this._tocInserts = this._textContainer.querySelectorAll('.wb-toc-insert');
 		//setToc before querying this.elPageNumbers
 		this.setToc();
 		//infos containers
@@ -159,7 +161,7 @@ class WebBook {
 		//last element
 		this._lastElement.style.marginBottom = "0px";
 
-		//this.refresh();
+		this.refresh();
 	};
 
 	setWidth(w) {
@@ -281,22 +283,44 @@ class WebBook {
 		return title;
 	}
 	
+	getCurrentSection() {
+		let position = -this._position;
+		for(let i=1; i<this._sections.length; i++) {
+			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
+				let id = this._sections[i-1].id;
+				this._bookContainer.querySelectorAll('[data-wb-toc] a').forEach( val => {
+					if(val.getAttribute('href').replace(/^#/,'') === id) {
+						if(!val.parentElement.className.match(/current/)) {
+							val.parentElement.className+=' current';
+						}
+					} else {
+						if(val.parentElement.className.match(/current/)) {
+							val.parentElement.className=val.parentElement.className.replace(/ current/,'');
+						}
+					}
+				});
+				break;
+			}
+		}
+	}
+	
 	setToc() {
-		let toc = this._bookContainer.querySelector('[data-wb-toc]');
-		if(toc.getAttribute('data-wb-toc')) {
+		if(!this._toc) { return; }
+		if(this._toc.getAttribute('data-wb-toc')) {
 			let tocTitle = document.createElement('p');
 			tocTitle.setAttribute('class','data-wb-toc-title');
 			tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
-			toc.appendChild(tocTitle);
+			this._toc.appendChild(tocTitle);
 		}
-		this._tocItems.forEach( val => {
+		this._tocInserts.forEach( val => {
 			let p = document.createElement('p');
 			p.innerHTML = val.getAttribute('data-wb-title');
+			p.setAttribute('class','wb-toc-item');
 			let a = document.createElement('a');
 			a.setAttribute('href', '#' + val.id);
 			a.setAttribute('class', 'wb-element-page-number wb-link');
 			p.appendChild(a);
-			toc.appendChild(p);
+			this._toc.appendChild(p);
 		})
 	}
 
@@ -336,52 +360,61 @@ class WebBook {
 		if(this.col===false) {
 			
 			this._currentPages.forEach( val => {
-				val.style.display = "none";
+				val.innerHTML = "";
 			});
 
 			this._totalPages.forEach( val => {
-				val.style.display = "none";
+				val.innerHTML = "";
 			});
 
 			this._currentTotalPages.forEach( val => {
-				val.style.display = "none";
+				val.innerHTML = "";
 			});
 			
 			this._elPageNumbers.forEach( val => {
-				val.style.display = "none";
+				val.innerHTML = "";
 			});
 
 			this._sectionTitles.forEach( val => {
-				val.style.display = "none";
+				val.innerHTML = "";
 			});
 			
 		} else {
 			
+			if(this._toc) {
+				this.getCurrentSection();
+			}	
+			
 			this._currentPages.forEach( val => {
-				val.innerHTML = this.getPageNumber();
-				val.style.display = "inline-block";
+				if(val.innerHTML!=this.getPageNumber()) {
+					val.innerHTML = this.getPageNumber();
+				}
 			});
 
 			this._totalPages.forEach( val => {
-				val.innerHTML = this.getTotalPages();
-				val.style.display = "inline-block";
+				if(val.innerHTML!=this.getTotalPages()) {
+					val.innerHTML = this.getTotalPages();
+				}
 			});
 
 			this._currentTotalPages.forEach( val => {
-				val.innerHTML = this.getPageNumber() + "/" + this.getTotalPages();
-				val.style.display = "inline-block";
+				if(val.innerHTML!== this.getPageNumber() + "/" + this.getTotalPages()) {
+					val.innerHTML = this.getPageNumber() + "/" + this.getTotalPages();
+				}
 			});
 
 			this._elPageNumbers.forEach( val => {
 				let id = val.getAttribute('href').replace(/^#/,'');
 				let pageNumber = this.elementPageNumber(id);
-				val.innerHTML = pageNumber;
-				val.style.display = "inline-block";
+				if(val.innerHTML!=pageNumber) {
+					val.innerHTML = pageNumber;
+				}
 			});
 			
 			this._sectionTitles.forEach( val => {
-				val.innerHTML = this.getSectionTitle();
-				val.style.display = "inline-block";
+				if(val.innerHTML!==this.getSectionTitle()) {
+					val.innerHTML = this.getSectionTitle();
+				}
 			});
 
 		}
