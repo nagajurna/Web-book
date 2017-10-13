@@ -2,7 +2,7 @@ class WebBook {
 	constructor(bookContainer, options) {
 		//containers
 		this._bookContainer = bookContainer;
-		this._container = bookContainer.querySelector('[data-wb-text-container]');
+		this._textContainer = bookContainer.querySelector('[data-wb-text-container]');
 		this._text = bookContainer.querySelector('[data-wb-text]');
 		//options
 		this._height = options.height;
@@ -11,7 +11,7 @@ class WebBook {
 		this._marginY = options.marginY===undefined ? 20 : options.marginY;
 		//init position, col ,containerWidth and bookmark
 		this._position = 0;
-		this.col = true;
+		this.col = true;//default true = toBook()
 		this._bookmark = null;
 		this._containerWidth = null;
 		//this.lastBreak is used as a ghost page
@@ -29,6 +29,10 @@ class WebBook {
 		this._breaks = this._text.querySelectorAll('.wb-text-break');
 		//elements : select all elements but .text-breaks (for bookmarks)
 		this._elements = this._text.querySelectorAll(':not(.wb-text-break)');
+		//toc-items
+		this._tocItems = this._textContainer.querySelectorAll('.wb-toc-item');
+		//setToc before querying this.elPageNumbers
+		this.setToc();
 		//infos containers
 		this._currentPages = this._bookContainer.querySelectorAll('.wb-current-page');
 		this._totalPages = this._bookContainer.querySelectorAll('.wb-total-pages');
@@ -36,42 +40,41 @@ class WebBook {
 		this._elPageNumbers = this._bookContainer.querySelectorAll('.wb-element-page-number');
 		this._sectionTitles = this._bookContainer.querySelectorAll('.wb-current-section-title');
 		
-		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth' in document.body.style) {
-			this.toBook();
-		}
-		
 		//links : replace default with goToPage
 		let links = this._bookContainer.querySelectorAll('.wb-link');
-		for(let i=0; i<links.length; i++) {
-			links[i].addEventListener('click', e => {
+		links.forEach( val => {
+			val.addEventListener('click', e => {
 				if(this.col===true) {
 					e.preventDefault();
-					let href = e.target.href;
-					let id = href.replace(/^.+#/,"");
+					let href = e.target.getAttribute('href');
+					let id = href.replace(/^#/,"");
 					this.goToPage(this.elementPageNumber(id));
-					
 				}
 			}, false);
+		})
+		
+		
+		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth' in document.body.style) {
+			this.toBook();
 		}
 
 	}
 
 	toBook() {
 		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
-			
 			this.col = true;
-			let cs = this._container.style;
+			let cs = this._textContainer.style;
 			let ts = this._text.style;
-			console.log(this._bookContainer.clientHeight);
 			//text-container
+			cs.boxSizing = "border-box";
 			cs.overflow = "hidden";
 			cs.position = "relative";
-			//cs.left = 0;
-			//cs.top = 0;
+			cs.left = 0;
+			cs.top = 0;
 			cs.padding = "0px";
 			cs.height = this.getHeight() + "px";
 			cs.maxWidth = this.getWidth() + "px";//maxWidth : responsive
-			this._containerWidth = this._container.clientWidth;//responsive
+			this._containerWidth = this._textContainer.clientWidth;//responsive
 			
 			//sections
 			//hack firefox (pour offsetLeft) : minHeight = 10%
@@ -92,22 +95,23 @@ class WebBook {
 			}
 
 			//text
+			ts.boxSizing = "border-box";
 			ts.position = "absolute";
 			ts.left = 0;
-			ts.boxSizing = "border-box";
+			ts.top = 0;
 			ts.height = "100%";
 			ts.width = "100%";
 			ts.paddingRight = this.getMarginX() + "px";
 			ts.paddingLeft = this.getMarginX() + "px";
 			ts.paddingTop = this.getMarginY() + "px";
 			ts.paddingBottom = this.getMarginY() + "px";
+			ts.MozColumnFill = "auto";//important !!!
 			ts.WebkitColumnsWidth = this._containerWidth + "px";
 			ts.MozColumnWidth = this._containerWidth + "px";
 			ts.columnWidth = this._containerWidth + "px";
 			ts.MozColumnGap = this.getMarginX()*2 + "px";
 			ts.WebkitColumnGap = this.getMarginX()*2 + "px";
 			ts.columnGap = this.getMarginX()*2 + "px";
-			ts.MozColumnFill = "auto";//important !!!
 			
 			//Go to bookmark
 			if(this._bookmark) {
@@ -276,6 +280,25 @@ class WebBook {
 		}
 		return title;
 	}
+	
+	setToc() {
+		let toc = this._bookContainer.querySelector('[data-wb-toc]');
+		if(toc.getAttribute('data-wb-toc')) {
+			let tocTitle = document.createElement('p');
+			tocTitle.setAttribute('class','data-wb-toc-title');
+			tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
+			toc.appendChild(tocTitle);
+		}
+		this._tocItems.forEach( val => {
+			let p = document.createElement('p');
+			p.innerHTML = val.getAttribute('data-wb-title');
+			let a = document.createElement('a');
+			a.setAttribute('href', '#' + val.id);
+			a.setAttribute('class', 'wb-element-page-number wb-link');
+			p.appendChild(a);
+			toc.appendChild(p);
+		})
+	}
 
 	insertBookmark() {
 		let bookmark = null;
@@ -350,7 +373,7 @@ class WebBook {
 			});
 
 			this._elPageNumbers.forEach( val => {
-				let id = val.getAttribute('data-wb-element');
+				let id = val.getAttribute('href').replace(/^#/,'');
 				let pageNumber = this.elementPageNumber(id);
 				val.innerHTML = pageNumber;
 				val.style.display = "inline-block";

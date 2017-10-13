@@ -6,13 +6,9 @@ window.addEventListener('load', function() {
 	//height (responsive)
 	if(window.innerHeight < 740) {
 		h =  window.innerHeight-50;
-		//bookContainer.style.marginTop = "0px";
 	} else {
 		h = 650;
-		//bookContainer.style.marginTop = "40px";
 	 }
-	 
-	 //bookContainer.style.height = h+50+"px";
 	
 	//new Book
 	var book = new WebBook(bookContainer, {
@@ -24,14 +20,10 @@ window.addEventListener('load', function() {
 		if(event.target.innerHeight < 740) {
 			h = event.target.innerHeight-50;
 			book.setHeight(h);
-			//bookContainer.style.marginTop = "0px";
 		} else {
 			h = 650;
 			book.setHeight(h);
-			//bookContainer.style.marginTop = "40px";
 		}
-		
-		 //bookContainer.style.height = h+50+"px";
 		
 		if(book.col===true) {
 			book.toBook();

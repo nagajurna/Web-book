@@ -1,7 +1,6 @@
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
-const concat = require('gulp-concat');
 const sourcemaps = require('gulp-sourcemaps');
 
 const paths = {
@@ -14,9 +13,8 @@ gulp.task('scripts', () => {
 			.pipe(babel({
 				presets: ['env']
 			}))
+			.pipe(uglify())
 		.pipe(sourcemaps.write())
-		.pipe(uglify())
-		.pipe(concat('wb.js'))
         .pipe(gulp.dest('dist'));
 });
 
