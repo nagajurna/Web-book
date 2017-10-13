@@ -283,7 +283,7 @@ class WebBook {
 		return title;
 	}
 	
-	getCurrentSection() {
+	getTocCurrentSection() {
 		let position = -this._position;
 		for(let i=1; i<this._sections.length; i++) {
 			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
@@ -382,7 +382,7 @@ class WebBook {
 		} else {
 			
 			if(this._toc) {
-				this.getCurrentSection();
+				this.getTocCurrentSection();
 			}	
 			
 			this._currentPages.forEach( val => {
