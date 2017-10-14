@@ -243,18 +243,24 @@ class WebBook {
 		let index, startIndex, endIndex;
 		for(let i=0; i< this._sections.length-1; i++) {
 			if(this._sections[i].className.match(/wb-no-page/)) {
-				if(startIndex) {
+				if(startIndex!==undefined) {
 					endIndex = i;
-					this._endPage = this.elementPageNumber(this._sections[endIndex].id);
+					let el = this._sections[endIndex];
+					let elPosition = el.offsetLeft - this.getMarginX();
+					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+					this._endPage = elPosition/this._containerWidth + 1;
 					console.log(this._endPage);
 					break;
 				} else {
 					index = i;
 				}
 			} else {
-				if(index && !startIndex) {
+				if(index!==undefined && startIndex===undefined) {
 					startIndex = i;
-					this._startPage = this.elementPageNumber(this._sections[startIndex].id);
+					let el = this._sections[startIndex];
+					let elPosition = el.offsetLeft - this.getMarginX();
+					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+					this._startPage = elPosition/this._containerWidth;
 					console.log(this._startPage);
 				}
 			}
@@ -263,17 +269,20 @@ class WebBook {
 
 	getPageNumber() {
 		let pageNumber = Math.abs(Math.floor(this._position/this._containerWidth))+1;
+		pageNumber = pageNumber-(this._startPage);
 		return pageNumber;
 	}
 
 	getTotalPages() {
 		let totalPages = Math.floor(this._lastElement.offsetLeft/this._containerWidth);
+		totalPages = totalPages-(this._startPage);
 		return totalPages;
 	}
 
 	goToPage(number) {
-		number = (number<1 ? 1 : number);
+		number = (number<1-(this._startPage) ? 1-(this._startPage) : number);
 		number= (number>this.getTotalPages() ? this.getTotalPages() : number);
+		number = number + (this._startPage);
 		let position = this._containerWidth*(number-1);
 		this._text.style.left = -position + "px";
 		this._position = this._text.offsetLeft;
@@ -285,6 +294,7 @@ class WebBook {
 		let elPosition = el.offsetLeft - this.getMarginX();
 		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 		let elPageNumber = elPosition/this._containerWidth + 1;
+		elPageNumber = elPageNumber-(this._startPage);
 		return elPageNumber;
 	}
 
@@ -425,7 +435,9 @@ class WebBook {
 			});
 
 			this._currentTotalPages.forEach( val => {
-				if(val.innerHTML!== this.getPageNumber() + "/" + this.getTotalPages()) {
+				if(this.getPageNumber() < 1) {
+					val.innerHTML = "&emsp;&emsp;";
+				} else if(val.innerHTML!== this.getPageNumber() + "/" + this.getTotalPages()) {
 					val.innerHTML = this.getPageNumber() + "/" + this.getTotalPages();
 				}
 			});
@@ -433,7 +445,9 @@ class WebBook {
 			this._elPageNumbers.forEach( val => {
 				let id = val.getAttribute('data-wb-element-page-number');
 				let pageNumber = this.elementPageNumber(id);
-				if(val.innerHTML!=pageNumber) {
+				if(pageNumber < 1) {
+					val.innerHTML = "";
+				} else if(val.innerHTML!=pageNumber) {
 					val.innerHTML = pageNumber;
 				}
 			});
