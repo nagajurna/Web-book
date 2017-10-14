@@ -37,7 +37,7 @@ class WebBook {
 		this._currentPages = this._bookContainer.querySelectorAll('.wb-current-page');
 		this._totalPages = this._bookContainer.querySelectorAll('.wb-total-pages');
 		this._currentTotalPages = this._bookContainer.querySelectorAll('.wb-currentByTotal-pages');
-		this._elPageNumbers = this._bookContainer.querySelectorAll('.wb-element-page-number');
+		this._elPageNumbers = this._bookContainer.querySelectorAll('[data-wb-element-page-number]');
 		this._sectionTitles = this._bookContainer.querySelectorAll('.wb-current-section-title');
 		//start/end pagination
 		this._startPage = null;
@@ -320,7 +320,8 @@ class WebBook {
 				p.setAttribute('class','wb-toc-item');
 				let a = document.createElement('a');
 				a.setAttribute('href', '#' + val.id);
-				a.setAttribute('class', 'wb-element-page-number wb-link');
+				a.setAttribute('class', 'wb-link');
+				a.setAttribute('data-wb-element-page-number', val.id);
 				p.appendChild(a);
 				this._toc.appendChild(p);
 			}
@@ -430,7 +431,7 @@ class WebBook {
 			});
 
 			this._elPageNumbers.forEach( val => {
-				let id = val.getAttribute('href').replace(/^#/,'');
+				let id = val.getAttribute('data-wb-element-page-number');
 				let pageNumber = this.elementPageNumber(id);
 				if(val.innerHTML!=pageNumber) {
 					val.innerHTML = pageNumber;
