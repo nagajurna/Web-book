@@ -21,7 +21,7 @@ class WebBook {
 		//this._lastElement is used as landmark
 		this._lastElement = document.createElement("div");
 		this._lastElement.innerHTML = "&nbsp;";//not empty (for mozColumns)
-		this._lastElement.className = "wb-section";
+		this._lastElement.className = "wb-section wb-no-toc";
 		this._text.appendChild(this._lastElement);
 		//sections
 		this._sections = this._text.querySelectorAll('.wb-section');
@@ -31,8 +31,6 @@ class WebBook {
 		this._elements = this._text.querySelectorAll(':not(.wb-text-break)');
 		//toc
 		this._toc = this._bookContainer.querySelector('[data-wb-toc]');
-		//toc-inserts
-		this._tocInserts = this._textContainer.querySelectorAll('.wb-toc-insert');
 		//setToc before querying this.elPageNumbers
 		this.setToc();
 		//infos containers
@@ -259,7 +257,7 @@ class WebBook {
 	}
 
 	elementPageNumber(id) {
-		let el = document.getElementById(id);
+		let el = this._text.querySelector('#' + id);
 		let elPosition = el.offsetLeft - this.getMarginX();
 		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 		let elPageNumber = elPosition/this._containerWidth + 1;
@@ -283,12 +281,34 @@ class WebBook {
 		return title;
 	}
 	
+	setToc() {
+		if(!this._toc) { return; }
+		if(this._toc.getAttribute('data-wb-toc')) {
+			let tocTitle = document.createElement('p');
+			tocTitle.setAttribute('class','data-wb-toc-title');
+			tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
+			this._toc.appendChild(tocTitle);
+		}
+		this._sections.forEach( val => {
+			if(!val.className.match(/wb-no-toc/)) {
+				let p = document.createElement('p');
+				p.innerHTML = val.getAttribute('data-wb-title');
+				p.setAttribute('class','wb-toc-item');
+				let a = document.createElement('a');
+				a.setAttribute('href', '#' + val.id);
+				a.setAttribute('class', 'wb-element-page-number wb-link');
+				p.appendChild(a);
+				this._toc.appendChild(p);
+			}
+		})
+	}
+	
 	getTocCurrentSection() {
 		let position = -this._position;
 		for(let i=1; i<this._sections.length; i++) {
 			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
 				let id = this._sections[i-1].id;
-				this._bookContainer.querySelectorAll('[data-wb-toc] a').forEach( val => {
+				this._toc.querySelectorAll('a').forEach( val => {
 					if(val.getAttribute('href').replace(/^#/,'') === id) {
 						if(!val.parentElement.className.match(/current/)) {
 							val.parentElement.className+=' current';
@@ -302,26 +322,6 @@ class WebBook {
 				break;
 			}
 		}
-	}
-	
-	setToc() {
-		if(!this._toc) { return; }
-		if(this._toc.getAttribute('data-wb-toc')) {
-			let tocTitle = document.createElement('p');
-			tocTitle.setAttribute('class','data-wb-toc-title');
-			tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
-			this._toc.appendChild(tocTitle);
-		}
-		this._tocInserts.forEach( val => {
-			let p = document.createElement('p');
-			p.innerHTML = val.getAttribute('data-wb-title');
-			p.setAttribute('class','wb-toc-item');
-			let a = document.createElement('a');
-			a.setAttribute('href', '#' + val.id);
-			a.setAttribute('class', 'wb-element-page-number wb-link');
-			p.appendChild(a);
-			this._toc.appendChild(p);
-		})
 	}
 
 	insertBookmark() {

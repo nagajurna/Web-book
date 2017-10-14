@@ -29,7 +29,9 @@
   text-align: justify;
   line-height: 160%;
   background-color: #FAEBD7;
-  /*transition: left 0.5s;*/
+/*
+  transition: left 0.1s;
+*/
 }
 
 a.wb-link {
