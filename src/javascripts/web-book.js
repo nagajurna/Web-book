@@ -32,14 +32,16 @@ class WebBook {
 		//toc
 		this._toc = this._bookContainer.querySelector('[data-wb-toc]');
 		//setToc before querying this.elPageNumbers
-		this.setToc();
+		this.getToc();
 		//infos containers
 		this._currentPages = this._bookContainer.querySelectorAll('.wb-current-page');
 		this._totalPages = this._bookContainer.querySelectorAll('.wb-total-pages');
 		this._currentTotalPages = this._bookContainer.querySelectorAll('.wb-currentByTotal-pages');
 		this._elPageNumbers = this._bookContainer.querySelectorAll('.wb-element-page-number');
 		this._sectionTitles = this._bookContainer.querySelectorAll('.wb-current-section-title');
-		
+		//start/end pagination
+		this._startPage = null;
+		this._endPage = null;
 		//links : replace default with goToPage
 		let links = this._bookContainer.querySelectorAll('.wb-link');
 		links.forEach( val => {
@@ -236,6 +238,28 @@ class WebBook {
 			this.refresh();
 		}
 	}
+	
+	getPageScope() {
+		let index, startIndex, endIndex;
+		for(let i=0; i< this._sections.length-1; i++) {
+			if(this._sections[i].className.match(/wb-no-page/)) {
+				if(startIndex) {
+					endIndex = i;
+					this._endPage = this.elementPageNumber(this._sections[endIndex].id);
+					console.log(this._endPage);
+					break;
+				} else {
+					index = i;
+				}
+			} else {
+				if(index && !startIndex) {
+					startIndex = i;
+					this._startPage = this.elementPageNumber(this._sections[startIndex].id);
+					console.log(this._startPage);
+				}
+			}
+		}
+	}
 
 	getPageNumber() {
 		let pageNumber = Math.abs(Math.floor(this._position/this._containerWidth))+1;
@@ -281,12 +305,12 @@ class WebBook {
 		return title;
 	}
 	
-	setToc() {
+	getToc() {
 		if(!this._toc) { return; }
 		if(this._toc.getAttribute('data-wb-toc')) {
 			let tocTitle = document.createElement('p');
-			tocTitle.setAttribute('class','data-wb-toc-title');
-			tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
+			tocTitle.setAttribute('class','wb-toc-title');
+			tocTitle.innerHTML = this._toc.getAttribute('data-wb-toc');
 			this._toc.appendChild(tocTitle);
 		}
 		this._sections.forEach( val => {
@@ -304,7 +328,6 @@ class WebBook {
 	}
 	
 	getTocCurrentSection() {
-		console.log('ok');
 		let position = -this._position;
 		for(let i=1; i<this._sections.length; i++) {
 			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
@@ -381,6 +404,8 @@ class WebBook {
 			});
 			
 		} else {
+			
+			this.getPageScope();
 			
 			if(this._toc) {
 				this.getTocCurrentSection();

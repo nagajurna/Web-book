@@ -78,7 +78,7 @@ a.wb-link:hover {
 	color: #424242;
 }
 
-.section-title, .notes-title, .table-title, .data-wb-toc-title {
+.section-title, .notes-title, .table-title, .wb-toc-title {
 	border-bottom: 1px solid black;
 	font-size: 1.2em;
 }
