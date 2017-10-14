@@ -47,7 +47,7 @@ class WebBook {
 			val.addEventListener('click', e => {
 				if(this.col===true) {
 					e.preventDefault();
-					let href = e.target.getAttribute('href');
+					let href = e.currentTarget.getAttribute('href');
 					let id = href.replace(/^#/,"");
 					this.goToPage(this.elementPageNumber(id));
 				}
@@ -122,7 +122,7 @@ class WebBook {
 			
 			//Refresh info containers
 			this.refresh();
-			
+			console.log(this._bookContainer.offsetHeight - this.getHeight());
 		}
 	}
 
@@ -313,19 +313,28 @@ class WebBook {
 			tocTitle.innerHTML = this._toc.getAttribute('data-wb-toc');
 			this._toc.appendChild(tocTitle);
 		}
+		let list = document.createElement('ul');
+		list.setAttribute('class','wb-toc-list');
 		this._sections.forEach( val => {
 			if(!val.className.match(/wb-no-toc/)) {
-				let p = document.createElement('p');
-				p.innerHTML = val.getAttribute('data-wb-title');
-				p.setAttribute('class','wb-toc-item');
-				let a = document.createElement('a');
-				a.setAttribute('href', '#' + val.id);
-				a.setAttribute('class', 'wb-link');
-				a.setAttribute('data-wb-element-page-number', val.id);
-				p.appendChild(a);
-				this._toc.appendChild(p);
+				let item = document.createElement('li');
+				item.setAttribute('class','wb-toc-item');
+				let link = document.createElement('a');
+				link.setAttribute('href', '#' + val.id);
+				link.setAttribute('class', 'wb-link');
+				let title = document.createElement('span');
+				title.setAttribute('class','wb-toc-item-title');
+				title.innerHTML = val.getAttribute('data-wb-title');
+				let page = document.createElement('span');
+				title.setAttribute('class','wb-toc-item-page-number');
+				page.setAttribute('data-wb-element-page-number', val.id);
+				link.appendChild(title);
+				link.appendChild(page);
+				item.appendChild(link);
+				list.appendChild(item);
 			}
-		})
+		});
+		this._toc.appendChild(list);
 	}
 	
 	getTocCurrentSection() {

@@ -100,11 +100,39 @@ a.wb-link:hover {
 	font-size: 1.1em;
 }
 
+/*
 #table a.wb-link, #toc a.wb-link {
 	float: right;
 	margin-right: 1em;
 	vertical-align: top;
 	text-align: left;
+}
+*/
+#table ul, #toc ul {
+	padding: 0px;
+}
+
+#table li, #toc li {
+	list-style: none;
+	padding: .5em .5em;
+}
+
+#table a.wb-link, #toc a.wb-link {
+	display: inline-block;
+	width: 100%;
+	border: none;
+}
+
+#toc li.current, #toc li.current a.wb-link {
+	color: #8B0000;
+}
+
+#toc li.current a.wb-link:hover {
+	color: #000;
+}
+
+#table [data-wb-element-page-number], #toc [data-wb-element-page-number] {
+	float: right;
 }
 
 .wb-toc-item.current, .wb-toc-item.current a.wb-link {
