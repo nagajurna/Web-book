@@ -304,6 +304,7 @@ class WebBook {
 	}
 	
 	getTocCurrentSection() {
+		console.log('ok');
 		let position = -this._position;
 		for(let i=1; i<this._sections.length; i++) {
 			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
