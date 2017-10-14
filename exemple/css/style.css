@@ -20,12 +20,12 @@
     }
 }
 
-#textContainer {
+[data-wb-text-container] {
 	background-color: #FAEBD7;
 	margin: auto;
 }
 
-#text {
+[data-wb-text] {
   text-align: justify;
   line-height: 160%;
   background-color: #FAEBD7;
@@ -100,20 +100,12 @@ a.wb-link:hover {
 	font-size: 1.1em;
 }
 
-/*
-#table a.wb-link, #toc a.wb-link {
-	float: right;
-	margin-right: 1em;
-	vertical-align: top;
-	text-align: left;
-}
-*/
 #table ul, #toc ul {
 	padding: 0px;
 }
 
 #table li, #toc li {
-	list-style: none;
+	list-style-type: none;
 	padding: .5em .5em;
 }
 

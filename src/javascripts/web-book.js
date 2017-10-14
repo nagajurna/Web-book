@@ -122,7 +122,7 @@ class WebBook {
 			
 			//Refresh info containers
 			this.refresh();
-			console.log(this._bookContainer.offsetHeight - this.getHeight());
+			//console.log(this._bookContainer.offsetHeight - this.getHeight());
 		}
 	}
 
@@ -297,7 +297,7 @@ class WebBook {
 				if(id!==undefined && this.getPageNumber() === this.elementPageNumber(id)) {
 					title = "";
 				} else {
-					title = this._sections[i-1].getAttribute('data-wb-title');
+					title = this._sections[i-1].title;
 				}
 				break;
 			}
@@ -324,7 +324,7 @@ class WebBook {
 				link.setAttribute('class', 'wb-link');
 				let title = document.createElement('span');
 				title.setAttribute('class','wb-toc-item-title');
-				title.innerHTML = val.getAttribute('data-wb-title');
+				title.innerHTML = val.title;
 				let page = document.createElement('span');
 				title.setAttribute('class','wb-toc-item-page-number');
 				page.setAttribute('data-wb-element-page-number', val.id);
