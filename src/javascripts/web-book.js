@@ -39,9 +39,8 @@ class WebBook {
 		this._currentTotalPages = this._bookContainer.querySelectorAll('.wb-currentByTotal-pages');
 		this._elPageNumbers = this._bookContainer.querySelectorAll('[data-wb-element-page-number]');
 		this._sectionTitles = this._bookContainer.querySelectorAll('.wb-current-section-title');
-		//start/end pagination
+		//start pagination
 		this._startPage = null;
-		this._endPage = null;
 		//links : replace default with goToPage
 		let links = this._bookContainer.querySelectorAll('.wb-link');
 		links.forEach( val => {
@@ -239,21 +238,11 @@ class WebBook {
 		}
 	}
 	
-	getPageScope() {
-		let index, startIndex, endIndex;
+	getPageStart() {
+		let index, startIndex;
 		for(let i=0; i< this._sections.length-1; i++) {
 			if(this._sections[i].className.match(/wb-no-page/)) {
-				if(startIndex!==undefined) {
-					endIndex = i;
-					let el = this._sections[endIndex];
-					let elPosition = el.offsetLeft - this.getMarginX();
-					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-					this._endPage = elPosition/this._containerWidth + 1;
-					console.log(this._endPage);
-					break;
-				} else {
-					index = i;
-				}
+				index = i;
 			} else {
 				if(index!==undefined && startIndex===undefined) {
 					startIndex = i;
@@ -261,14 +250,15 @@ class WebBook {
 					let elPosition = el.offsetLeft - this.getMarginX();
 					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 					this._startPage = elPosition/this._containerWidth;
-					console.log(this._startPage);
 				}
 			}
 		}
 	}
 
 	getPageNumber() {
+		//this._position/this._containerWidth is start of a page : start 0 is page 1,... (so : +1)
 		let pageNumber = Math.abs(Math.floor(this._position/this._containerWidth))+1;
+		//this._startPage (pagination start)
 		pageNumber = pageNumber-(this._startPage);
 		return pageNumber;
 	}
@@ -293,7 +283,7 @@ class WebBook {
 		let el = this._text.querySelector('#' + id);
 		let elPosition = el.offsetLeft - this.getMarginX();
 		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-		let elPageNumber = elPosition/this._containerWidth + 1;
+		let elPageNumber = elPosition/this._containerWidth + 1;//elPosition/this._containerWidth is position of a page : position 0 is page 1,...
 		elPageNumber = elPageNumber-(this._startPage);
 		return elPageNumber;
 	}
@@ -416,7 +406,7 @@ class WebBook {
 			
 		} else {
 			
-			this.getPageScope();
+			this.getPageStart();
 			
 			if(this._toc) {
 				this.getTocCurrentSection();
