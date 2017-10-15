@@ -339,11 +339,11 @@ class WebBook {
 	
 	getTocCurrentSection() {
 		let position = -this._position;
-		this._tocs.forEach ( val => {
+		this._tocs.forEach ( toc => {
 			for(let i=1; i<this._sections.length; i++) {
 				if(this._sections[i].offsetLeft-this._containerWidth>=position) {
 					let id = this._sections[i-1].id;
-					val.querySelectorAll('a').forEach( val => {
+					toc.querySelectorAll('a').forEach( val => {
 						if(val.getAttribute('href').replace(/^#/,'') === id) {
 							if(!val.parentElement.className.match(/current/)) {
 								val.parentElement.className+=' current';
@@ -420,7 +420,7 @@ class WebBook {
 			
 			this.getPageStart();
 			
-			if(this._toc) {
+			if(this._tocs.length!==0) {
 				this.getTocCurrentSection();
 			}	
 			

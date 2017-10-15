@@ -135,9 +135,11 @@ a.wb-link:hover {
 	float: right;
 }
 
+/*
 .wb-toc-item.current, .wb-toc-item.current a.wb-link {
 	color: #8B0000;
 }
+*/
 
 #table p {
 	clear: both;
