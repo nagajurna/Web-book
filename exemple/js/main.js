@@ -1,29 +1,39 @@
 window.addEventListener('load', function() {
 	//book-container
-	var bookContainer = document.getElementById('bookContainer');
-	var h;
 	
-	//height (responsive)
-	if(window.innerHeight < 740) {
-		h =  window.innerHeight-50;
-	} else {
-		h = 650;
+	var h, w;
+	
+	//width (responsive)
+	if(window.innerWidth >= 768) {
+		h = window.innerHeight-88-60;//navBars height *2 (2*44) + textContainer top * 2 (2*30)
+		w = 640;
+	 } else {
+		 h = window.innerHeight;
+		 w = window.innerWidth;
 	 }
 	
 	//new Book
 	var book = new WebBook(bookContainer, {
 		 height: h,
-		 maxWidth: 620});
+		 maxWidth: w,
+		 marginY: 45});
+		 
+	setTimeout(function() {
+		bookContainer.className = 'show';
+	},300);
 		 	 
 	//on resize
 	window.addEventListener('resize',function(event) {
-		if(event.target.innerHeight < 740) {
-			h = event.target.innerHeight-50;
-			book.setHeight(h);
+		if(window.innerWidth >= 768) {
+			h = window.innerHeight-88-60;
+			w = 640;
 		} else {
-			h = 650;
-			book.setHeight(h);
+			h = window.innerHeight;
+			w = window.innerWidth;
 		}
+		
+		book.setHeight(h);
+		book.setMaxWidth(w);
 		
 		if(book.col===true) {
 			book.toBook();
@@ -41,6 +51,13 @@ window.addEventListener('load', function() {
 	bookContainer.querySelector('#backward').addEventListener('click', function() {
 		book.backward();
 	}, false);
+	bookContainer.querySelector('#forward-large').addEventListener('click', function() {
+		book.forward();
+	}, false);
+
+	bookContainer.querySelector('#backward-large').addEventListener('click', function() {
+		book.backward();
+	}, false);
 	
 	//bottom
 	var bottom = bookContainer.querySelector('#bottom');
@@ -50,6 +67,9 @@ window.addEventListener('load', function() {
 	var toc = bookContainer.querySelector('#toc');
 	toc.style.display = book.col ? 'block' : 'none';
 	bookContainer.querySelector('#showTable').addEventListener('click', function() {
+		toc.className = toc.className === "show" ? "" : "show";
+		}, false);
+	bookContainer.querySelector('#showTable-large').addEventListener('click', function() {
 		toc.className = toc.className === "show" ? "" : "show";
 		}, false);
 	
@@ -65,4 +85,5 @@ window.addEventListener('load', function() {
 	}, false);
 		
 }, false);
+
 	

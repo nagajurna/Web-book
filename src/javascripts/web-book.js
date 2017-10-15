@@ -30,7 +30,7 @@ class WebBook {
 		//elements : select all elements but .text-breaks (for bookmarks)
 		this._elements = this._text.querySelectorAll(':not(.wb-text-break)');
 		//toc
-		this._toc = this._bookContainer.querySelector('[data-wb-toc]');
+		this._tocs = this._bookContainer.querySelectorAll('[data-wb-toc]');
 		//setToc before querying this.elPageNumbers
 		this.getToc();
 		//infos containers
@@ -70,11 +70,9 @@ class WebBook {
 			cs.boxSizing = "border-box";
 			cs.overflow = "hidden";
 			cs.position = "relative";
-			cs.left = 0;
-			cs.top = 0;
 			cs.padding = "0px";
 			cs.height = this.getHeight() + "px";
-			cs.maxWidth = this.getWidth() + "px";//maxWidth : responsive
+			cs.maxWidth = this.getMaxWidth() + "px";//maxWidth : responsive
 			this._containerWidth = this._textContainer.clientWidth;//responsive
 			
 			//sections
@@ -133,7 +131,7 @@ class WebBook {
 		let ts = this._text.style;
 		//container
 		cs.height = "auto";
-		cs.maxWidth = this.getWidth() + "px";
+		cs.maxWidth = this.getMaxWidth() + "px";
 		cs.overflow = "visible";
 		//text
 		ts.position = "static";
@@ -163,12 +161,12 @@ class WebBook {
 		this.refresh();
 	};
 
-	setWidth(w) {
+	setMaxWidth(w) {
 		this._width = w;
 		return this;
 	}
 
-	getWidth() {
+	getMaxWidth() {
 		return this._width;
 	}
 
@@ -306,56 +304,61 @@ class WebBook {
 	}
 	
 	getToc() {
-		if(!this._toc) { return; }
-		if(this._toc.getAttribute('data-wb-toc')) {
-			let tocTitle = document.createElement('p');
-			tocTitle.setAttribute('class','wb-toc-title');
-			tocTitle.innerHTML = this._toc.getAttribute('data-wb-toc');
-			this._toc.appendChild(tocTitle);
-		}
-		let list = document.createElement('ul');
-		list.setAttribute('class','wb-toc-list');
-		this._sections.forEach( val => {
-			if(!val.className.match(/wb-no-toc/)) {
-				let item = document.createElement('li');
-				item.setAttribute('class','wb-toc-item');
-				let link = document.createElement('a');
-				link.setAttribute('href', '#' + val.id);
-				link.setAttribute('class', 'wb-link');
-				let title = document.createElement('span');
-				title.setAttribute('class','wb-toc-item-title');
-				title.innerHTML = val.title;
-				let page = document.createElement('span');
-				title.setAttribute('class','wb-toc-item-page-number');
-				page.setAttribute('data-wb-element-page-number', val.id);
-				link.appendChild(title);
-				link.appendChild(page);
-				item.appendChild(link);
-				list.appendChild(item);
+		if(this._tocs.length===0) { return; }
+		this._tocs.forEach( val => {
+			if(val.getAttribute('data-wb-toc')) {
+				let tocTitle = document.createElement('p');
+				tocTitle.setAttribute('class','wb-toc-title');
+				tocTitle.innerHTML = val.getAttribute('data-wb-toc');
+				val.appendChild(tocTitle);
 			}
+			let list = document.createElement('ul');
+			list.setAttribute('class','wb-toc-list');
+			this._sections.forEach( val => {
+				if(!val.className.match(/wb-no-toc/)) {
+					let item = document.createElement('li');
+					item.setAttribute('class','wb-toc-item');
+					let link = document.createElement('a');
+					link.setAttribute('href', '#' + val.id);
+					link.setAttribute('class', 'wb-link');
+					let title = document.createElement('span');
+					title.setAttribute('class','wb-toc-item-title');
+					title.innerHTML = val.title;
+					let page = document.createElement('span');
+					title.setAttribute('class','wb-toc-item-page-number');
+					page.setAttribute('data-wb-element-page-number', val.id);
+					link.appendChild(title);
+					link.appendChild(page);
+					item.appendChild(link);
+					list.appendChild(item);
+				}
+			});
+			val.appendChild(list);
 		});
-		this._toc.appendChild(list);
 	}
 	
 	getTocCurrentSection() {
 		let position = -this._position;
-		for(let i=1; i<this._sections.length; i++) {
-			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
-				let id = this._sections[i-1].id;
-				this._toc.querySelectorAll('a').forEach( val => {
-					if(val.getAttribute('href').replace(/^#/,'') === id) {
-						if(!val.parentElement.className.match(/current/)) {
-							val.parentElement.className+=' current';
+		this._tocs.forEach ( val => {
+			for(let i=1; i<this._sections.length; i++) {
+				if(this._sections[i].offsetLeft-this._containerWidth>=position) {
+					let id = this._sections[i-1].id;
+					val.querySelectorAll('a').forEach( val => {
+						if(val.getAttribute('href').replace(/^#/,'') === id) {
+							if(!val.parentElement.className.match(/current/)) {
+								val.parentElement.className+=' current';
+							}
+						} else {
+							if(val.parentElement.className.match(/current/)) {
+								val.parentElement.className=val.parentElement.className.replace(/ current/,'');
+							}
 						}
-					} else {
-						if(val.parentElement.className.match(/current/)) {
-							val.parentElement.className=val.parentElement.className.replace(/ current/,'');
-						}
-					}
-				});
-				break;
+					});
+					break;
+				}
 			}
-		}
+		});
+		
 	}
 
 	insertBookmark() {

@@ -4,40 +4,54 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<title>Web-book</title>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link href='css/normalize.css' rel='stylesheet' type='text/css'>
 		<link href='css/style.css' rel='stylesheet' type='text/css'>
+		<script src="js/main.js"></script>
 	</head>
 	<body>
+		 <div id="navBarTop" class="w3-bar w3-white w3-border-bottom w3-large">
+			  <a href="#" class="w3-bar-item w3-button">Web-Book</a>
+		</div>
+		
 		<div id="bookContainer">
+			<div id="navBarBottom" class="w3-bottom">
+			  <div class="w3-bar w3-white w3-border-top w3-large">
+				  <div id="bottom-large-2">
+					  <button id="backward-large" type="button" class="w3-btn w3-margin-right">&lt;</button>
+					  <button id="forward-large" type="button" class="w3-btn w3-margin-left">&gt;</button>
+					  <button id="showTable-large" type="button" class="w3-btn">&bull;</button>
+				  </div>		  
+			  </div>
+			</div>
 
-			<div id="toc">
-				<div data-wb-toc="Sommaire">
-					<button type="button" id="close">&times;</button>
+			<div data-wb-text-container class="w3-card-4">
+				
+				<div id="toc">
+					<div data-wb-toc="Sommaire">
+						<button type="button" id="close">&times;</button>
+					</div>
 				</div>
-			</div>
-
-			<div id="top">
-				<span class="wb-current-section-title"></span>
-			</div>
-
-			<div data-wb-text-container>
+				
+				<div id="top">
+					<span class="wb-current-section-title"></span>
+				</div>
+				
+				<div id="bottom">
+					<button id="backward" type="button">&lt;</button>
+					<span class="wb-currentByTotal-pages"></span>
+					<button id="forward" type="button">&gt;</button>
+					<button id="showTable" type="button">&bull;</button>
+				</div>
+				
+				<div id="bottom-large">
+					<span class="wb-currentByTotal-pages"></span>
+				</div>
+				
 				<div data-wb-text>
-					<div class="wb-section wb-no-page wb-no-toc" title="Titre" id="titre">
+					<div class="wb-section wb-no-page" title="Titre" id="titre">
 						<p class="book-title">Lorem Ipsum</p>
 						<p class="book-subtitle">Tergentes quae tergentes theatrales&nbsp;per</p>
-					</div>
-					<div class="wb-text-break"></div>
-					<div class="wb-section" title="Table des matières" id="table">
-						<p class="table-title text-center">Table des matières</p>
-						<ul>
-							<li><a href="#chapitre1" class="wb-link"><span>Chapitre I </span><span data-wb-element-page-number="chapitre1"></span></a></li>
-							<li><a href="#chapitre2" class="wb-link"><span>Chapitre II </span><span data-wb-element-page-number="chapitre2"></span></a></li>
-							<li><a href="#chapitre3" class="wb-link"><span>Chapitre III </span><span data-wb-element-page-number="chapitre3"></span></a></li>
-							<li><a href="#chapitre4" class="wb-link"><span>Chapitre IV </span><span data-wb-element-page-number="chapitre4"></span></a></li>
-							<li><a href="#chapitre5" class="wb-link"><span>Chapitre V </span><span data-wb-element-page-number="chapitre5"></span></a></li>
-							<li><a href="#chapitre6" class="wb-link"><span>Chapitre VI </span><span data-wb-element-page-number="chapitre6"></span></a></li>
-						</ul>
-						
 					</div>
 					<div class="wb-text-break"></div>
 					<div class="wb-section" title="Chapitre I" id="chapitre1">
@@ -110,18 +124,25 @@
 						<p class="note" id="note2"><a href="#appel2" class="wb-link">2.&ensp;</a>Se ampliores per posse omnes Saepe in ille ille ordinis sunt omnino volebat posse sibi erat ordinis Maximum posse Mummio nequaquam anteposuit inferiori Maximum posse est sunt dicam ordinis nostro.</p>
 						<p class="note" id="note3"><a href="#appel3" class="wb-link">3.&ensp;</a>Pendentem videre nihil mirum mentibus.</p>
 					</div>
+					<div class="wb-text-break"></div>
+					<div class="wb-section" title="Table des matières" id="table">
+						<p class="table-title text-center">Table des matières</p>
+						<ul>
+							<li><a href="#chapitre1" class="wb-link"><span>Chapitre I </span><span data-wb-element-page-number="chapitre1"></span></a></li>
+							<li><a href="#chapitre2" class="wb-link"><span>Chapitre II </span><span data-wb-element-page-number="chapitre2"></span></a></li>
+							<li><a href="#chapitre3" class="wb-link"><span>Chapitre III </span><span data-wb-element-page-number="chapitre3"></span></a></li>
+							<li><a href="#chapitre4" class="wb-link"><span>Chapitre IV </span><span data-wb-element-page-number="chapitre4"></span></a></li>
+							<li><a href="#chapitre5" class="wb-link"><span>Chapitre V </span><span data-wb-element-page-number="chapitre5"></span></a></li>
+							<li><a href="#chapitre6" class="wb-link"><span>Chapitre VI </span><span data-wb-element-page-number="chapitre6"></span></a></li>
+						</ul>
+						
+					</div>
 				</div>
-			</div>
-
-			<div id="bottom">
-				<button id="backward" type="button">&lt;</button>
-				<span class="wb-currentByTotal-pages"></span>
-				<button id="forward" type="button">&gt;</button>
-				<button id="showTable" type="button">&bull;</button>
+							
 			</div>
 
 		</div>
+		
 		<script src="../dist/web-book.min.js"></script>
-		<script src="js/main.js"></script>
 	</body>
 </html>

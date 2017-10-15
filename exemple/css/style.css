@@ -1,37 +1,45 @@
-#bookContainer {
-	font-family: 'Georgia', serif;
-	font-size: 11pt;
-	position: relative;
-	max-width: 620px;
-	margin: auto;
-	background-color: #FAEBD7;
-	margin-top: 0px;
+#navBarTop, #navBarBottom {
+	display: none;
 }
 
-@media screen and (min-height: 740px) {
-	#bookContainer {
-		margin-top: 40px;
+@media screen and (min-width: 768px) {
+	#navBarTop, #navBarBottom {
+		display: block;
 	}
 }
 
-@media screen and (min-width: 520px) {
-    #bookContainer {
-        font-size: 12pt;
-    }
+#bookContainer {
+	position: relative;
+	bottom: -2000px;
+	margin: auto;
+	transition: bottom 1s ease-in-out;
+}
+
+#bookContainer.show {
+	bottom: 0px;
 }
 
 [data-wb-text-container] {
-	background-color: #FAEBD7;
 	margin: auto;
+	background-color: #fff;
+	font-family: 'Georgia', serif;
+	top: 0px;
+/*
+	background: url(../../assets/papier_velin.jpg);
+	background-size: cover;
+*/
+	
+}
+
+@media screen and (min-width: 768px) {
+	[data-wb-text-container] {
+		top: 30px;
+	}
 }
 
 [data-wb-text] {
   text-align: justify;
-  line-height: 160%;
-  background-color: #FAEBD7;
-/*
-  transition: left 0.1s;
-*/
+  line-height: 1.6em;
 }
 
 a.wb-link {
@@ -49,10 +57,10 @@ a.wb-link:hover {
 	top: -1000px;
 	width: 100%;
 	height: 100%;
-	background-color: #FAEBD7;
+	background-color: #fff;
 	z-index: 1000;
 	overflow-y: auto;
-	transition: top 0.3s;
+	transition: top 0.6s ease-in-out;
 	display: none;
 }
 
@@ -116,7 +124,7 @@ a.wb-link:hover {
 }
 
 #toc li.current, #toc li.current a.wb-link {
-	color: #8B0000;
+	color: #000;
 }
 
 #toc li.current a.wb-link:hover {
@@ -136,7 +144,8 @@ a.wb-link:hover {
 }
 
 #top {
-	position: relative;
+	position: absolute;
+	top: 0px;
 	box-sizing: border-box;
 	padding-top: 6px;
 	text-align: center;
@@ -149,11 +158,41 @@ a.wb-link:hover {
 }
 
 #bottom {
-	position: relative;
+	position: absolute;
+	bottom: 5px;
 	display: inline-block;
-	height: 25px;
+	height: 30px;
 	width: 100%;
 	text-align: center;
+	z-index: 500;
+}
+
+#bottom-large {
+	position: absolute;
+	bottom: -9999px;
+	display: inline-block;
+	height: 30px;
+	width: 100%;
+	text-align: center;
+	z-index: 500;
+}
+
+#bottom-large-2 {
+	display: inline-block;
+	width: 100%;
+	height: 44px;
+	text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+		
+	#bottom {
+		bottom: -9999px
+	}
+	
+	#bottom-large {
+		bottom: 5px;
+	}
 }
 
 #bottom button {
@@ -163,10 +202,11 @@ a.wb-link:hover {
 	margin-right: 10px;
 	margin-left: 10px;
 	min-width: 25px;
+	height: 100%;
 	padding: 0;
 }
 
-#showTable {
+#showTable, #showTable-large {
 	position: absolute;
 	right: 0px;
 	bottom: 0px;
