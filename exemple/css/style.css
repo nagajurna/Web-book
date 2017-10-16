@@ -1,47 +1,37 @@
-#navBarTop, #navBarBottom {
+html, body, #navBarBottom {
+	background-color: #f5f5f5;
+	font-family: 'Georgia', serif;
+}
+
+/*
+NAVBARS
+*/
+#nav-bar-top, #nav-bar-bottom {
 	display: none;
 }
 
 @media screen and (min-width: 768px) {
-	#navBarTop, #navBarBottom {
+	#nav-bar-top, #nav-bar-bottom {
 		display: block;
 	}
 }
 
-#bookContainer {
+#nav-bar-bottom-controls {
+	display: block;
 	position: relative;
-	bottom: -2000px;
+	width: 640px;
 	margin: auto;
-	transition: bottom 1s ease-in-out;
+	height: 44px;
+	text-align: center;
 }
 
-#bookContainer.show {
-	bottom: 0px;
+#nav-bar-bottom-controls button {
+	outline: none;
 }
 
-[data-wb-text-container] {
-	margin: auto;
-	background-color: #fff;
-	font-family: 'Georgia', serif;
-	top: 0px;
 /*
-	background: url(../../assets/papier_velin.jpg);
-	background-size: cover;
+LINKS
 */
-	
-}
-
-@media screen and (min-width: 768px) {
-	[data-wb-text-container] {
-		top: 30px;
-	}
-}
-
-[data-wb-text] {
-  text-align: justify;
-  line-height: 1.6em;
-}
-
 a.wb-link {
 	color: #424242;
 	text-decoration: none;
@@ -52,28 +42,170 @@ a.wb-link:hover {
 	color: #000;
 }
 
+/*
+BOOKCONTAINER
+*/
+#bookContainer {
+	opacity: 0.0;
+	margin: auto;
+	transition: opacity 1s;
+}
+
+#bookContainer.show {
+	opacity: 1.0;
+}
+
+/*
+TEXTCONTAINER
+*/
+[data-wb-text-container] {
+	margin: auto;
+	background-color: #fff;
+	top: 0px;
+}
+
+@media screen and (min-width: 768px) {
+	[data-wb-text-container] {
+		top: 30px;
+	}
+}
+
+/*
+TEXT
+*/
+[data-wb-text] {
+  text-align: justify;
+  line-height: 1.6em;
+}
+
+/*
+TOC-LARGE-DEVICE
+*/
+
+#toc-large-device {
+  position: absolute;
+  left: -33%;
+  width: 33%;
+  margin-top: 30px;
+  transition: left 0.4s;
+  display: none;
+}
+
+@media screen and (min-width: 1366px) {
+
+	#toc-large-device {
+		display: inline-block
+	}
+
+}
+
+#toc-large-device.open {
+	left: 0px;
+}
+
+#toc-large-device > div {
+	width: 100%;
+	background-color: #fff;
+	z-index: 1000;
+	overflow-y: auto;
+}
+
+#toc-large-device > div > div {
+	background-color: #fff;
+	position: relative;
+	height: 100%;
+	width: calc(100%-20px);
+}
+
+/*
+toggle toc-large-device, swing-container, swing-bar
+*/
+#toggle-toc-large-device {
+	position: absolute;
+	left: calc(100% + 10px);
+	top: 0px;
+	outline: none;
+	background: #fff;
+}
+
+/*
+if toc-large-device.open : swing-container to left
+*/
+#swing-container {
+	margin-left: 0px;
+	transition: margin-left 0.6s;
+}
+
+#swing-container.left {
+		margin-left: 0px;
+	}
+
+@media screen and (min-width: 1366px) {
+	#swing-container.left {
+		margin-left: 33%;
+	}
+}
+
+/*
+if toc-large-device.open : swing-bar to left
+*/
+#swing-bar {
+	margin-left: 0px;
+	transition: margin-left 0.9s;
+}
+
+#swing-bar.left {
+	margin-left: 0px;
+}
+
+@media screen and (min-width: 1366px) {
+	#swing-bar.left {
+		margin-left: 33%;
+	}
+}
+
+/*
+TOC
+*/
 #toc {
 	position: absolute;
 	top: -1000px;
 	width: 100%;
-	height: 100%;
-	background-color: #fff;
+	max-height: 100%;
 	z-index: 1000;
 	overflow-y: auto;
-	transition: top 0.6s ease-in-out;
-	display: none;
+	transition: top 0.4s;
+	padding: 15px;
+
 }
 
-#toc.show {
+#toc.open {
 	top: 0px;
 }
 
 #toc > div {
 	position: relative;
-	padding: 35px;
+	background-color: #fff;
 }
 
-#close {
+.open-toc {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	font-size: 1.4em;
+}
+
+#open-toc-large {
+	display: inline-block;
+}
+
+@media screen and (min-width: 1366px) {
+	#open-toc-large {
+		display: none;
+	}
+}
+
+#close-toc {
 	position: absolute;
 	right: 5px;
 	top: 5px;
@@ -85,66 +217,41 @@ a.wb-link:hover {
 	font-size: 1.2em;
 	color: #424242;
 }
-
-.section-title, .notes-title, .table-title, .wb-toc-title {
-	border-bottom: 1px solid black;
-	font-size: 1.2em;
-}
-
-.section-title {
-	padding-top: 50px;
-}
-
-#titre {
-	text-align: center;
-}
-
-.book-title {
-	font-size: 1.3em;
-	padding-top: 5%;
-}
-
-.book-subtitle {
-	font-size: 1.1em;
-}
-
-#table ul, #toc ul {
+/*
+toc list
+*/
+#toc ul, #toc-large-device ul {
 	padding: 0px;
 }
 
-#table li, #toc li {
+#toc li, #toc-large-device li {
 	list-style-type: none;
 	padding: .5em .5em;
 }
 
-#table a.wb-link, #toc a.wb-link {
+#toc a.wb-link, #toc-large-device a.wb-link {
 	display: inline-block;
 	width: 100%;
 	border: none;
 }
 
-#toc li.current, #toc li.current a.wb-link {
+#toc li.current a.wb-link, #toc-large-device li.current a.wb-link {
+	color: #000;
+	outline: none;
+}
+
+#toc li.current a.wb-link:hover, #toc-large-device li.current a.wb-link:hover {
 	color: #000;
 }
 
-#toc li.current a.wb-link:hover {
-	color: #000;
-}
-
-#table [data-wb-element-page-number], #toc [data-wb-element-page-number] {
+#toc [data-wb-element-page-number], #toc-large-device [data-wb-element-page-number] {
 	float: right;
 }
 
+
 /*
-.wb-toc-item.current, .wb-toc-item.current a.wb-link {
-	color: #8B0000;
-}
+TOP
 */
-
-#table p {
-	clear: both;
-}
-
 #top {
 	position: absolute;
 	top: 0px;
@@ -155,10 +262,13 @@ a.wb-link:hover {
 	height: 25px;
 }
 
-.wb-current-section-title {
+#top .wb-current-section-title {
 	font-size: 0.8em;
 }
 
+/*
+BOTTOM
+*/
 #bottom {
 	position: absolute;
 	bottom: 5px;
@@ -177,13 +287,6 @@ a.wb-link:hover {
 	width: 100%;
 	text-align: center;
 	z-index: 500;
-}
-
-#bottom-large-2 {
-	display: inline-block;
-	width: 100%;
-	height: 44px;
-	text-align: center;
 }
 
 @media screen and (min-width: 768px) {
@@ -208,9 +311,53 @@ a.wb-link:hover {
 	padding: 0;
 }
 
-#showTable, #showTable-large {
-	position: absolute;
-	right: 0px;
-	bottom: 0px;
-	font-size: 1.4em;
+/*
+INSIDE TEXT
+*/
+/*
+TITLES
+*/
+.section-title, .notes-title, .table-title, .wb-toc-title {
+	border-bottom: 1px solid black;
+	font-size: 1.2em;
 }
+
+.section-title {
+	padding-top: 50px;
+}
+
+#titre {
+	text-align: center;
+}
+
+.book-title {
+	font-size: 1.3em;
+	padding-top: 5%;
+}
+
+.book-subtitle {
+	font-size: 1.1em;
+}
+
+/*
+TABLE DES MATIÈRES
+*/
+#table ul {
+	padding: 0px;
+}
+
+#table li {
+	list-style-type: none;
+	padding: .5em .5em;
+}
+
+#table a.wb-link {
+	display: inline-block;
+	width: 100%;
+	border: none;
+}
+
+#table [data-wb-element-page-number] {
+	float: right;
+}
+

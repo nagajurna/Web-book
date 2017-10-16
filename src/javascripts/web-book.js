@@ -220,7 +220,7 @@ class WebBook {
 		}
 	}
 
-	tofirstPage() {
+	toFirstPage() {
 		if(this._position < 0) {
 			this._position = 0;
 			this._text.style.left = this._position + "px";
@@ -228,7 +228,7 @@ class WebBook {
 		}
 	}
 
-	tolastPage() {
+	toLastPage() {
 		if(this._lastElement.offsetLeft+this._position > this._containerWidth+this.getMarginX()) {
 			this._position = this._containerWidth+this.getMarginX()-this._lastElement.offsetLeft;
 			this._text.style.left = this._position+"px";
@@ -251,6 +251,11 @@ class WebBook {
 				}
 			}
 		}
+	}
+	
+	checkFirstPage() {
+		let check = this._position===0 ? true : false;
+		return check;
 	}
 
 	getPageNumber() {
