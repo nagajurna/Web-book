@@ -1,5 +1,7 @@
 window.addEventListener('load', function() {
 	
+	var bookContainer = document.querySelector('#bookContainer');
+	
 	//DIMENSIONS
 	var h, w;
 	
@@ -29,15 +31,15 @@ window.addEventListener('load', function() {
 	window.addEventListener('resize',function(event) {
 		if(window.innerWidth >= 768) {
 			h = window.innerHeight-88-60;
-			//w = 640;
+			w = 640;
 		} else {
 			h = window.innerHeight;
-			//w = window.innerWidth;
+			w = window.innerWidth;
 		}
 		
-		//set new
+		//set new dimensions
 		book.setHeight(h);
-		//book.setMaxWidth(w);
+		book.setMaxwidth(w);
 		
 		if(book.col===true) {
 			book.toBook();
