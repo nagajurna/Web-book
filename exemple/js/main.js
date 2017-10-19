@@ -39,7 +39,7 @@ window.addEventListener('load', function() {
 		
 		//set new dimensions
 		book.setHeight(h);
-		book.setMaxwidth(w);
+		book.setMaxWidth(w);
 		
 		if(book.col===true) {
 			book.toBook();

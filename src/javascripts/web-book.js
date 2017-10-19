@@ -43,16 +43,17 @@ class WebBook {
 		this._startPage = null;
 		//links : replace default with goToPage
 		let links = this._bookContainer.querySelectorAll('.wb-link');
-		links.forEach( val => {
-			val.addEventListener('click', e => {
+				
+		for(let i=0; i<links.length; i++) {
+			links[i].addEventListener('click', e => {
 				if(this.col===true) {
 					e.preventDefault();
 					let href = e.currentTarget.getAttribute('href');
 					let id = href.replace(/^#/,"");
 					this.goToPage(this.elementPageNumber(id));
 				}
-			}, false);
-		})
+			}, false)
+		}
 		
 		
 		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth' in document.body.style) {
@@ -310,59 +311,68 @@ class WebBook {
 	
 	getToc() {
 		if(this._tocs.length===0) { return; }
-		this._tocs.forEach( val => {
-			if(val.getAttribute('data-wb-toc')) {
+		
+		for(let i=0; i<this._tocs.length; i++) {
+			let toc = this._tocs[i];
+			if(toc.getAttribute('data-wb-toc')) {
 				let tocTitle = document.createElement('p');
 				tocTitle.setAttribute('class','wb-toc-title');
-				tocTitle.innerHTML = val.getAttribute('data-wb-toc');
-				val.appendChild(tocTitle);
+				tocTitle.innerHTML = toc.getAttribute('data-wb-toc');
+				toc.appendChild(tocTitle);
 			}
 			let list = document.createElement('ul');
 			list.setAttribute('class','wb-toc-list');
-			this._sections.forEach( val => {
-				if(!val.className.match(/wb-no-toc/)) {
+			for(let j=0; j<this._sections.length; j++) {
+				let section = this._sections[j];
+				if(!section.className.match(/wb-no-toc/)) {
 					let item = document.createElement('li');
 					item.setAttribute('class','wb-toc-item');
 					let link = document.createElement('a');
-					link.setAttribute('href', '#' + val.id);
+					link.setAttribute('href', '#' + section.id);
 					link.setAttribute('class', 'wb-link');
 					let title = document.createElement('span');
 					title.setAttribute('class','wb-toc-item-title');
-					title.innerHTML = val.title;
+					title.innerHTML = section.title;
 					let page = document.createElement('span');
 					title.setAttribute('class','wb-toc-item-page-number');
-					page.setAttribute('data-wb-element-page-number', val.id);
+					page.setAttribute('data-wb-element-page-number', section.id);
 					link.appendChild(title);
 					link.appendChild(page);
 					item.appendChild(link);
 					list.appendChild(item);
 				}
-			});
-			val.appendChild(list);
-		});
+			}
+			toc.appendChild(list);
+		}
 	}
 	
 	getTocCurrentSection() {
 		let position = -this._position;
-		this._tocs.forEach ( toc => {
+				
+		for(let i=0; i<this._tocs.length; i++) {
+			let toc = this._tocs[i];
 			for(let i=1; i<this._sections.length; i++) {
 				if(this._sections[i].offsetLeft-this._containerWidth>=position) {
 					let id = this._sections[i-1].id;
-					toc.querySelectorAll('a').forEach( val => {
-						if(val.getAttribute('href').replace(/^#/,'') === id) {
-							if(!val.parentElement.className.match(/current/)) {
-								val.parentElement.className+=' current';
+					let links = toc.querySelectorAll('a');
+					for(let j=0; j<links.length; j++) {
+						let link = links[j];
+						if(link.getAttribute('href').replace(/^#/,'') === id) {
+							if(!link.parentElement.className.match(/current/)) {
+								link.parentElement.className+=' current';
 							}
 						} else {
-							if(val.parentElement.className.match(/current/)) {
-								val.parentElement.className=val.parentElement.className.replace(/ current/,'');
+							if(link.parentElement.className.match(/current/)) {
+								link.parentElement.className=link.parentElement.className.replace(/ current/,'');
 							}
 						}
-					});
+					}
+					
 					break;
 				}
 			}
-		});
+			
+		}
 		
 	}
 
@@ -401,25 +411,25 @@ class WebBook {
 
 		if(this.col===false) {
 			
-			this._currentPages.forEach( val => {
-				val.innerHTML = "";
-			});
+			for(let i=0; i<this._currentPages.length; i++) {
+				this._currentPages[i].innerHTML = "";
+			}
 
-			this._totalPages.forEach( val => {
-				val.innerHTML = "";
-			});
+			for(let i=0; i<this._totalPages.length; i++) {
+				this._totalPages[i].innerHTML = "";
+			}
 
-			this._currentTotalPages.forEach( val => {
-				val.innerHTML = "";
-			});
+			for(let i=0; i<this._currentTotalPages.length; i++) {
+				this._currentTotalPages[i].innerHTML = "";
+			}
 			
-			this._elPageNumbers.forEach( val => {
-				val.innerHTML = "";
-			});
+			for(let i=0; i<this._elPageNumbers.length; i++) {
+				this._elPageNumbers[i].innerHTML = "";
+			}
 
-			this._sectionTitles.forEach( val => {
-				val.innerHTML = "";
-			});
+			for(let i=0; i<this._sectionTitles.length; i++) {
+				this._sectionTitles[i].innerHTML = "";
+			}
 			
 		} else {
 			
@@ -429,41 +439,41 @@ class WebBook {
 				this.getTocCurrentSection();
 			}	
 			
-			this._currentPages.forEach( val => {
-				if(val.innerHTML!=this.getPageNumber()) {
-					val.innerHTML = this.getPageNumber();
+			for(let i=0; i<this._currentPages.length; i++) {
+				if(this._currentPages[i].innerHTML!=this.getPageNumber()) {
+					this._currentPages[i].innerHTML = this.getPageNumber();
 				}
-			});
-
-			this._totalPages.forEach( val => {
-				if(val.innerHTML!=this.getTotalPages()) {
-					val.innerHTML = this.getTotalPages();
+			}
+			
+			for(let i=0; i<this._totalPages.length; i++) {
+				if(this._totalPages[i].innerHTML!=this.getPageNumber()) {
+					this._totalPages[i].innerHTML = this.getPageNumber();
 				}
-			});
+			}
 
-			this._currentTotalPages.forEach( val => {
+			for(let i=0; i<this._currentTotalPages.length; i++) {
 				if(this.getPageNumber() < 1) {
-					val.innerHTML = "&emsp;&emsp;";
-				} else if(val.innerHTML!== this.getPageNumber() + "/" + this.getTotalPages()) {
-					val.innerHTML = this.getPageNumber() + "/" + this.getTotalPages();
+					this._currentTotalPages[i].innerHTML = "";
+				} else if(this._currentTotalPages[i].innerHTML!== this.getPageNumber() + "/" + this.getTotalPages()) {
+					this._currentTotalPages[i].innerHTML = this.getPageNumber() + "/" + this.getTotalPages();
 				}
-			});
+			}
 
-			this._elPageNumbers.forEach( val => {
-				let id = val.getAttribute('data-wb-element-page-number');
+			for(let i=0; i<this._elPageNumbers.length; i++) {
+				let id = this._elPageNumbers[i].getAttribute('data-wb-element-page-number');
 				let pageNumber = this.elementPageNumber(id);
 				if(pageNumber < 1) {
-					val.innerHTML = "";
-				} else if(val.innerHTML!=pageNumber) {
-					val.innerHTML = pageNumber;
+					this._elPageNumbers[i].innerHTML = "";
+				} else if(this._elPageNumbers[i].innerHTML!=pageNumber) {
+					this._elPageNumbers[i].innerHTML = pageNumber;
 				}
-			});
+			}
 			
-			this._sectionTitles.forEach( val => {
-				if(val.innerHTML!==this.getSectionTitle()) {
-					val.innerHTML = this.getSectionTitle();
+			for(let i=0; i<this._sectionTitles.length; i++) {
+				if(this._sectionTitles[i].innerHTML!=this.getSectionTitle()) {
+					this._sectionTitles[i].innerHTML = this.getSectionTitle();
 				}
-			});
+			}
 
 		}
 	}
