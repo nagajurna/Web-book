@@ -58,6 +58,8 @@ class WebBook {
 		
 		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth' in document.body.style) {
 			this.toBook();
+		} else {
+			this.toScroll();
 		}
 
 	}
@@ -69,6 +71,7 @@ class WebBook {
 			let ts = this._text.style;
 			//text-container
 			cs.boxSizing = "border-box";
+			cs.webkitBoxSizing = "border-box";
 			cs.overflow = "hidden";
 			cs.position = "relative";
 			cs.padding = "0px";
@@ -96,6 +99,7 @@ class WebBook {
 
 			//text
 			ts.boxSizing = "border-box";
+			ts.webkitBoxSizing = "border-box";
 			ts.position = "absolute";
 			ts.left = 0;
 			ts.top = 0;
@@ -106,6 +110,7 @@ class WebBook {
 			ts.paddingTop = this.getMarginY() + "px";
 			ts.paddingBottom = this.getMarginY() + "px";
 			ts.MozColumnFill = "auto";//important !!!
+			ts.columnFill = "auto";//important !!!
 			ts.WebkitColumnsWidth = this._containerWidth + "px";
 			ts.MozColumnWidth = this._containerWidth + "px";
 			ts.columnWidth = this._containerWidth + "px";

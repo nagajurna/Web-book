@@ -115,7 +115,7 @@ TOC-LARGE-DEVICE
 	background-color: #fff;
 	position: relative;
 	height: 100%;
-	width: calc(100%-20px);
+	width: 100%;
 }
 
 /*
@@ -123,10 +123,11 @@ toggle toc-large-device, swing-container, swing-bar
 */
 #toggle-toc-large-device {
 	position: absolute;
-	left: calc(100% + 10px);
+	left: 100%;
 	top: 0px;
 	outline: none;
 	background: #fff;
+	width: 63px;
 }
 
 /*
