@@ -25,6 +25,13 @@ class WebBook {
 		this._text.appendChild(this._lastElement);
 		//sections
 		this._sections = this._text.querySelectorAll('.wb-section');
+		//sections wb-no-toc
+		this._tocSections = []
+		for(let i=0; i<this._sections.length; i++) {
+			if(!this._sections[i].className.match(/wb-no-toc/)) {
+				this._tocSections.push(this._sections[i]);
+			}
+		}
 		//breaks
 		this._breaks = this._text.querySelectorAll('.wb-text-break');
 		//elements : select all elements but .text-breaks (for bookmarks)
@@ -105,6 +112,8 @@ class WebBook {
 			ts.top = 0;
 			ts.height = "100%";
 			ts.width = "100%";
+			ts.maxWidth = "100%";
+			ts.maxHeight = "100%";
 			ts.paddingRight = this.getMarginX() + "px";
 			ts.paddingLeft = this.getMarginX() + "px";
 			ts.paddingTop = this.getMarginY() + "px";
@@ -306,7 +315,7 @@ class WebBook {
 				if(id!==undefined && this.getPageNumber() === this.elementPageNumber(id)) {
 					title = "";
 				} else {
-					title = this._sections[i-1].title;
+					title = this._sections[i-1].getAttribute('data-wb-title') ? this._sections[i-1].getAttribute('data-wb-title') : this._sections[i-1].title;
 				}
 				break;
 			}
@@ -335,15 +344,17 @@ class WebBook {
 					let link = document.createElement('a');
 					link.setAttribute('href', '#' + section.id);
 					link.setAttribute('class', 'wb-link');
+					item.appendChild(link);
 					let title = document.createElement('span');
 					title.setAttribute('class','wb-toc-item-title');
-					title.innerHTML = section.title;
-					let page = document.createElement('span');
-					title.setAttribute('class','wb-toc-item-page-number');
-					page.setAttribute('data-wb-element-page-number', section.id);
+					title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
 					link.appendChild(title);
-					link.appendChild(page);
-					item.appendChild(link);
+					if(!section.className.match(/wb-toc-no-page-number/)) {
+						let page = document.createElement('span');
+						title.setAttribute('class','wb-toc-item-page-number');
+						page.setAttribute('data-wb-element-page-number', section.id);
+						link.appendChild(page);
+					}
 					list.appendChild(item);
 				}
 			}
@@ -353,12 +364,12 @@ class WebBook {
 	
 	getTocCurrentSection() {
 		let position = -this._position;
-				
+		this._tocSections.push(this._lastElement);
 		for(let i=0; i<this._tocs.length; i++) {
 			let toc = this._tocs[i];
-			for(let i=1; i<this._sections.length; i++) {
-				if(this._sections[i].offsetLeft-this._containerWidth>=position) {
-					let id = this._sections[i-1].id;
+			for(let i=1; i<this._tocSections.length; i++) {
+				if(this._tocSections[i].offsetLeft-this._containerWidth>=position) {
+					let id = this._tocSections[i-1].id;
 					let links = toc.querySelectorAll('a');
 					for(let j=0; j<links.length; j++) {
 						let link = links[j];
@@ -378,6 +389,7 @@ class WebBook {
 			}
 			
 		}
+		this._tocSections.pop(this._lastElement);
 		
 	}
 
