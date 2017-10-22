@@ -25,7 +25,7 @@ class WebBook {
 		this._text.appendChild(this._lastElement);
 		//sections
 		this._sections = this._text.querySelectorAll('.wb-section');
-		//sections wb-no-toc
+		//sections without wb-no-toc
 		this._tocSections = []
 		for(let i=0; i<this._sections.length; i++) {
 			if(!this._sections[i].className.match(/wb-no-toc/)) {
@@ -341,19 +341,24 @@ class WebBook {
 				if(!section.className.match(/wb-no-toc/)) {
 					let item = document.createElement('li');
 					item.setAttribute('class','wb-toc-item');
-					let link = document.createElement('a');
-					link.setAttribute('href', '#' + section.id);
-					link.setAttribute('class', 'wb-link');
-					item.appendChild(link);
-					let title = document.createElement('span');
-					title.setAttribute('class','wb-toc-item-title');
-					title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
-					link.appendChild(title);
 					if(!section.className.match(/wb-toc-no-page-number/)) {
+						let link = document.createElement('a');
+						link.setAttribute('href', '#' + section.id);
+						link.setAttribute('class', 'wb-link');
+						item.appendChild(link);
+						let title = document.createElement('span');
+						title.setAttribute('class','wb-toc-item-title');
+						title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
+						link.appendChild(title);
 						let page = document.createElement('span');
-						title.setAttribute('class','wb-toc-item-page-number');
+						page.setAttribute('class','wb-toc-item-page-number');	
 						page.setAttribute('data-wb-element-page-number', section.id);
 						link.appendChild(page);
+					} else {
+						let title = document.createElement('span');
+						title.setAttribute('class','wb-toc-item-title');
+						title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
+						item.appendChild(title);
 					}
 					list.appendChild(item);
 				}
@@ -365,6 +370,9 @@ class WebBook {
 	getTocCurrentSection() {
 		let position = -this._position;
 		this._tocSections.push(this._lastElement);
+		if(this._sections[0].className.match(/wb-no-toc/)) {
+			this._tocSections.unshift(this._sections[0]);
+		}
 		for(let i=0; i<this._tocs.length; i++) {
 			let toc = this._tocs[i];
 			for(let i=1; i<this._tocSections.length; i++) {
@@ -390,7 +398,9 @@ class WebBook {
 			
 		}
 		this._tocSections.pop(this._lastElement);
-		
+		if(this._sections[0].className.match(/wb-no-toc/)) {
+			this._tocSections.shift(this._sections[0]);
+		}
 	}
 
 	insertBookmark() {
