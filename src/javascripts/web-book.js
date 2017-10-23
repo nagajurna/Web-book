@@ -49,18 +49,20 @@ class WebBook {
 		//start pagination
 		this._startPage = null;
 		//links : replace default with goToPage
-		let links = this._bookContainer.querySelectorAll('.wb-link');
+		//let links = this._bookContainer.querySelectorAll('.wb-link');
 				
-		for(let i=0; i<links.length; i++) {
-			links[i].addEventListener('click', e => {
-				if(this.col===true) {
-					e.preventDefault();
-					let href = e.currentTarget.getAttribute('href');
-					let id = href.replace(/^#/,"");
-					this.goToPage(this.elementPageNumber(id));
-				}
-			}, false)
-		}
+		//for(let i=0; i<links.length; i++) {
+			//links[i].addEventListener('click', e => {
+				//if(this.col===true) {
+					//e.preventDefault();
+					//let href = e.currentTarget.getAttribute('href');
+					//let id = href.replace(/^#/,"");
+					//this.goToPage(this.elementPageNumber(id));
+				//}
+			//}, false)
+		//}
+		
+		this.setLinks();
 		
 		
 		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth' in document.body.style) {
@@ -72,13 +74,16 @@ class WebBook {
 	}
 
 	toBook() {
-		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
+		if('webkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
+			
+			
+			
 			this.col = true;
 			let cs = this._textContainer.style;
 			let ts = this._text.style;
 			//text-container
 			cs.boxSizing = "border-box";
-			cs.webkitBoxSizing = "border-box";
+			cs.WebkitBoxSizing = "border-box";
 			cs.overflow = "hidden";
 			cs.position = "relative";
 			cs.padding = "0px";
@@ -106,36 +111,35 @@ class WebBook {
 
 			//text
 			ts.boxSizing = "border-box";
-			ts.webkitBoxSizing = "border-box";
+			ts.WebkitBoxSizing = "border-box";
 			ts.position = "absolute";
 			ts.left = 0;
-			ts.top = 0;
+			ts.top = 0;	
 			ts.height = "100%";
 			ts.width = "100%";
-			ts.maxWidth = "100%";
-			ts.maxHeight = "100%";
 			ts.paddingRight = this.getMarginX() + "px";
 			ts.paddingLeft = this.getMarginX() + "px";
 			ts.paddingTop = this.getMarginY() + "px";
 			ts.paddingBottom = this.getMarginY() + "px";
 			ts.MozColumnFill = "auto";//important !!!
-			ts.columnFill = "auto";//important !!!
-			ts.WebkitColumnsWidth = this._containerWidth + "px";
+			ts.columnFill = "auto";//important !!!		
+			ts.WebkitColumnWidth = this._containerWidth + "px";
 			ts.MozColumnWidth = this._containerWidth + "px";
 			ts.columnWidth = this._containerWidth + "px";
 			ts.MozColumnGap = this.getMarginX()*2 + "px";
-			ts.WebkitColumnGap = this.getMarginX()*2 + "px";
+			ts.webkitColumnGap = this.getMarginX()*2 + "px";
 			ts.columnGap = this.getMarginX()*2 + "px";
+			
+			
 			
 			//Go to bookmark
 			if(this._bookmark) {
 				this.goToBookmark(this._bookmark);
-				this._position = this._text.offsetLeft;
+				this._position = Math.round($(this._text).position().left);
 			}
 			
 			//Refresh info containers
 			this.refresh();
-			//console.log(this._bookContainer.offsetHeight - this.getHeight());
 		}
 	}
 
@@ -157,10 +161,11 @@ class WebBook {
 		cs.paddingBottom = this.getMarginY() + "px";
 
 		if('WebkitColumnWidth' in document.body.style || 'MozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
-			ts.WebkitColumns = "auto 1";
+			ts.webkitColumns = "auto 1";
 			ts.MozColumns = "auto 1";
 			ts.columns = "auto 1";
 		}
+		
 
 		//Sections (for mozColumns)
 		for(let i=0; i<this._sections.length; i++) {
@@ -211,11 +216,25 @@ class WebBook {
 	getMarginY() {
 		return this._marginY;
 	}
+	
+	setLinks() {
+		let links = this._bookContainer.querySelectorAll('.wb-link');
+		for(let i=0; i<links.length; i++) {
+			links[i].addEventListener('click', e => {
+				if(this.col===true) {
+					e.preventDefault();
+					let href = e.currentTarget.getAttribute('href');
+					let id = href.replace(/^#/,"");
+					this.goToPage(this.elementPageNumber(id));
+				}
+			}, false)
+		}
+	}
 
 	forward() {
-		if(this._lastElement.offsetLeft+this._position > this._containerWidth+this.getMarginX()) {
+		if($(this._lastElement).position().left+this._position > this._containerWidth+this.getMarginX()) {
 			//let clone = this._text.cloneNode(true);
-			this._position = this._text.offsetLeft;
+			this._position = $(this._text).position().left;
 			this._position -= this._containerWidth;
 			this._text.style.left = this._position + "px";
 			
@@ -228,7 +247,7 @@ class WebBook {
 
 	backward() {
 		if(this._position < 0) {
-			this._position = this._text.offsetLeft;
+			this._position = $(this._text).position().left;
 			this._position += this._containerWidth;
 			this._text.style.left = this._position + "px";
 			this.refresh();
@@ -244,8 +263,8 @@ class WebBook {
 	}
 
 	toLastPage() {
-		if(this._lastElement.offsetLeft+this._position > this._containerWidth+this.getMarginX()) {
-			this._position = this._containerWidth+this.getMarginX()-this._lastElement.offsetLeft;
+		if($(this._lastElement).position().left+this._position > this._containerWidth+this.getMarginX()) {
+			this._position = this._containerWidth+this.getMarginX()-$(this._lastElement).position().left;
 			this._text.style.left = this._position+"px";
 			this.refresh();
 		}
@@ -260,7 +279,7 @@ class WebBook {
 				if(index!==undefined && startIndex===undefined) {
 					startIndex = i;
 					let el = this._sections[startIndex];
-					let elPosition = el.offsetLeft - this.getMarginX();
+					let elPosition = $(el).position().left - this.getMarginX();
 					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 					this._startPage = elPosition/this._containerWidth;
 				}
@@ -282,24 +301,24 @@ class WebBook {
 	}
 
 	getTotalPages() {
-		let totalPages = Math.floor(this._lastElement.offsetLeft/this._containerWidth);
+		let totalPages = Math.floor($(this._lastElement).position().left/this._containerWidth);
 		totalPages = totalPages-(this._startPage);
 		return totalPages;
 	}
 
 	goToPage(number) {
-		number = (number<1-(this._startPage) ? 1-(this._startPage) : number);
-		number= (number>this.getTotalPages() ? this.getTotalPages() : number);
+		number = number<1-this._startPage ? 1-this._startPage : number;
+		number= number>this.getTotalPages() ? this.getTotalPages() : number;
 		number = number + (this._startPage);
 		let position = this._containerWidth*(number-1);
 		this._text.style.left = -position + "px";
-		this._position = this._text.offsetLeft;
+		this._position = Math.round($(this._text).position().left);
 		this.refresh();
 	}
 
 	elementPageNumber(id) {
 		let el = this._text.querySelector('#' + id);
-		let elPosition = el.offsetLeft - this.getMarginX();
+		let elPosition = Math.round($(el).position().left) - this.getMarginX();
 		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 		let elPageNumber = elPosition/this._containerWidth + 1;//elPosition/this._containerWidth is position of a page : position 0 is page 1,...
 		elPageNumber = elPageNumber-(this._startPage);
@@ -310,7 +329,7 @@ class WebBook {
 		let position = -this._position;
 		let title;
 		for(let i=1; i<this._sections.length; i++) {
-			if(this._sections[i].offsetLeft-this._containerWidth>=position) {
+			if($(this._sections[i]).position().left-this._containerWidth>=position) {
 				let id = this._sections[i-1].id;
 				if(id!==undefined && this.getPageNumber() === this.elementPageNumber(id)) {
 					title = "";
@@ -376,7 +395,7 @@ class WebBook {
 		for(let i=0; i<this._tocs.length; i++) {
 			let toc = this._tocs[i];
 			for(let i=1; i<this._tocSections.length; i++) {
-				if(this._tocSections[i].offsetLeft-this._containerWidth>=position) {
+				if($(this._tocSections[i]).position().left-this._containerWidth>=position) {
 					let id = this._tocSections[i-1].id;
 					let links = toc.querySelectorAll('a');
 					for(let j=0; j<links.length; j++) {
@@ -406,7 +425,7 @@ class WebBook {
 	insertBookmark() {
 		let bookmark = null;
 		for(let i=0; i<this._elements.length; i++) {
-			let elPosition = this._elements[i].offsetLeft-this.getMarginX();
+			let elPosition = Math.round($(this._elements[i]).position().left)-this.getMarginX();
 			elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 			if(elPosition === -this._position)
 			{
@@ -425,11 +444,11 @@ class WebBook {
 	goToBookmark(bookmark) {
 		let element = this._elements[this._bookmark];
 		//position : offsetLeft of element relative to text
-		let position = element.offsetLeft-this.getMarginX();
+		let position = Math.round($(element).position().left)-this.getMarginX();
 		position = (position%this._containerWidth!==0 ? position-position%this._containerWidth : position);//always at a page beginning
 		//text position = -position
 		this._text.style.left = -position + "px";
-		this._position = this._text.offsetLeft;
+		this._position = $(this._text).position().left;
 		this.refresh();
 	}
 
