@@ -1,4 +1,6 @@
-class WebBook {
+import $ from 'jquery';
+
+export default class WebBook {
 	constructor(bookContainer, options) {
 		//containers
 		this._bookContainer = bookContainer;
@@ -49,19 +51,6 @@ class WebBook {
 		//start pagination
 		this._startPage = null;
 		//links : replace default with goToPage
-		//let links = this._bookContainer.querySelectorAll('.wb-link');
-				
-		//for(let i=0; i<links.length; i++) {
-			//links[i].addEventListener('click', e => {
-				//if(this.col===true) {
-					//e.preventDefault();
-					//let href = e.currentTarget.getAttribute('href');
-					//let id = href.replace(/^#/,"");
-					//this.goToPage(this.elementPageNumber(id));
-				//}
-			//}, false)
-		//}
-		
 		this.setLinks();
 		
 		
@@ -233,14 +222,9 @@ class WebBook {
 
 	forward() {
 		if($(this._lastElement).position().left+this._position > this._containerWidth+this.getMarginX()) {
-			//let clone = this._text.cloneNode(true);
 			this._position = $(this._text).position().left;
 			this._position -= this._containerWidth;
 			this._text.style.left = this._position + "px";
-			
-			//console.log(clone);
-			//clone.style.position = "absolute";
-			//this._container.insertBefore(clone,this.text);
 			this.refresh();
 		}
 	}
@@ -524,4 +508,3 @@ class WebBook {
 		}
 	}
 }
-

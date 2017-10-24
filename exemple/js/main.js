@@ -1,5 +1,5 @@
 window.addEventListener('load', function() {
-	
+
 	var bookContainer = document.querySelector('#bookContainer');
 	
 	//DIMENSIONS
