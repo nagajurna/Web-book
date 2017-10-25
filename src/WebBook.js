@@ -221,8 +221,8 @@ export default class WebBook {
 	}
 
 	forward() {
-		if($(this._lastElement).position().left+this._position > this._containerWidth+this.getMarginX()) {
-			this._position = $(this._text).position().left;
+		if(Math.round($(this._lastElement).position().left)+this._position > this._containerWidth+this.getMarginX()) {
+			this._position = Math.round($(this._text).position().left);
 			this._position -= this._containerWidth;
 			this._text.style.left = this._position + "px";
 			this.refresh();
@@ -231,7 +231,7 @@ export default class WebBook {
 
 	backward() {
 		if(this._position < 0) {
-			this._position = $(this._text).position().left;
+			this._position = Math.round($(this._text).position().left);
 			this._position += this._containerWidth;
 			this._text.style.left = this._position + "px";
 			this.refresh();
@@ -247,8 +247,8 @@ export default class WebBook {
 	}
 
 	toLastPage() {
-		if($(this._lastElement).position().left+this._position > this._containerWidth+this.getMarginX()) {
-			this._position = this._containerWidth+this.getMarginX()-$(this._lastElement).position().left;
+		if(Math.round($(this._lastElement).position().left)+this._position > this._containerWidth+this.getMarginX()) {
+			this._position = this._containerWidth+this.getMarginX()-Math.round($(this._lastElement).position().left);
 			this._text.style.left = this._position+"px";
 			this.refresh();
 		}
@@ -263,7 +263,7 @@ export default class WebBook {
 				if(index!==undefined && startIndex===undefined) {
 					startIndex = i;
 					let el = this._sections[startIndex];
-					let elPosition = $(el).position().left - this.getMarginX();
+					let elPosition = Math.round($(el).position().left) - this.getMarginX();
 					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 					this._startPage = elPosition/this._containerWidth;
 				}
@@ -313,7 +313,7 @@ export default class WebBook {
 		let position = -this._position;
 		let title;
 		for(let i=1; i<this._sections.length; i++) {
-			if($(this._sections[i]).position().left-this._containerWidth>=position) {
+			if(Math.round($(this._sections[i]).position().left)-this._containerWidth>=position) {
 				let id = this._sections[i-1].id;
 				if(id!==undefined && this.getPageNumber() === this.elementPageNumber(id)) {
 					title = "";
@@ -379,7 +379,7 @@ export default class WebBook {
 		for(let i=0; i<this._tocs.length; i++) {
 			let toc = this._tocs[i];
 			for(let i=1; i<this._tocSections.length; i++) {
-				if($(this._tocSections[i]).position().left-this._containerWidth>=position) {
+				if(Math.round($(this._tocSections[i]).position().left)-this._containerWidth>=position) {
 					let id = this._tocSections[i-1].id;
 					let links = toc.querySelectorAll('a');
 					for(let j=0; j<links.length; j++) {
@@ -432,7 +432,7 @@ export default class WebBook {
 		position = (position%this._containerWidth!==0 ? position-position%this._containerWidth : position);//always at a page beginning
 		//text position = -position
 		this._text.style.left = -position + "px";
-		this._position = $(this._text).position().left;
+		this._position = Math.round($(this._text).position().left);
 		this.refresh();
 	}
 
