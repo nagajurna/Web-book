@@ -14,7 +14,7 @@ export default class WebBook {
 		//init position, col ,containerWidth and bookmark
 		this._position = 0;
 		this.col = true;//default true = toBook()
-		this._bookmark = null;
+		this._bookmark = 0;
 		this._containerWidth = null;
 		//this.lastBreak is used as a ghost page
 		this._lastBreak = document.createElement("div");
@@ -24,6 +24,7 @@ export default class WebBook {
 		this._lastElement = document.createElement("div");
 		this._lastElement.innerHTML = "&nbsp;";//not empty (for mozColumns)
 		this._lastElement.className = "wb-section wb-no-toc";
+		this._lastElement.id = "last";
 		this._text.appendChild(this._lastElement);
 		//sections
 		this._sections = this._text.querySelectorAll('.wb-section');
@@ -49,7 +50,7 @@ export default class WebBook {
 		this._elPageNumbers = this._bookContainer.querySelectorAll('[data-wb-element-page-number]');
 		this._sectionTitles = this._bookContainer.querySelectorAll('.wb-current-section-title');
 		//start pagination
-		this._startPage = null;
+		this._startPage = 0;
 		//links : replace default with goToPage
 		this.setLinks();
 		
@@ -91,11 +92,13 @@ export default class WebBook {
 			for(let i=0; i<this._breaks.length; i++) {
 				if(this._breaks[i].style.marginBottom!=="300%") {
 					this._breaks[i].style.marginBottom = "300%";
+					this._breaks[i].style.width="0px";
 				}
 			}
 			//last element
 			if(this._lastElement.style.marginBottom!=="300%") {
 				this._lastElement.style.marginBottom = "300%";
+				this._lastElement.style.width="0px";
 			}
 
 			//text
@@ -123,7 +126,7 @@ export default class WebBook {
 			
 			//Go to bookmark
 			if(this._bookmark) {
-				this.goToBookmark(this._bookmark);
+				this.goToBookmark();
 				this._position = Math.round($(this._text).position().left);
 			}
 			
@@ -263,7 +266,7 @@ export default class WebBook {
 				if(index!==undefined && startIndex===undefined) {
 					startIndex = i;
 					let el = this._sections[startIndex];
-					let elPosition = Math.round($(el).position().left) - this.getMarginX();
+					let elPosition = $(el).position().left - this.getMarginX();
 					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
 					this._startPage = elPosition/this._containerWidth;
 				}
@@ -285,7 +288,7 @@ export default class WebBook {
 	}
 
 	getTotalPages() {
-		let totalPages = Math.floor($(this._lastElement).position().left/this._containerWidth);
+		let totalPages = Math.floor(Math.round($(this._lastElement).position().left)/this._containerWidth);
 		totalPages = totalPages-(this._startPage);
 		return totalPages;
 	}
@@ -304,7 +307,7 @@ export default class WebBook {
 		let el = this._text.querySelector('#' + id);
 		let elPosition = Math.round($(el).position().left) - this.getMarginX();
 		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-		let elPageNumber = elPosition/this._containerWidth + 1;//elPosition/this._containerWidth is position of a page : position 0 is page 1,...
+		let elPageNumber = (elPosition/this._containerWidth) + 1;//elPosition/this._containerWidth is position of a page : position 0 is page 1,...
 		elPageNumber = elPageNumber-(this._startPage);
 		return elPageNumber;
 	}
@@ -312,13 +315,14 @@ export default class WebBook {
 	getSectionTitle() {
 		let position = -this._position;
 		let title;
-		for(let i=1; i<this._sections.length; i++) {
-			if(Math.round($(this._sections[i]).position().left)-this._containerWidth>=position) {
-				let id = this._sections[i-1].id;
-				if(id!==undefined && this.getPageNumber() === this.elementPageNumber(id)) {
+		for(let i=0; i<this._sections.length; i++) {
+			let id = this._sections[i].id;
+			if(this.getPageNumber()<this.elementPageNumber(id)) {
+				let prevSectionId = this._sections[i-1].id;
+				if(this.getPageNumber()===this.elementPageNumber(prevSectionId)) {
 					title = "";
 				} else {
-					title = this._sections[i-1].getAttribute('data-wb-title') ? this._sections[i-1].getAttribute('data-wb-title') : this._sections[i-1].title;
+					title=this._sections[i-1].getAttribute('data-wb-title') ? this._sections[i-1].getAttribute('data-wb-title') : this._sections[i-1].title;
 				}
 				break;
 			}
@@ -407,25 +411,33 @@ export default class WebBook {
 	}
 
 	insertBookmark() {
-		let bookmark = null;
+		console.log(this._elements);
+		let elPosition;
+		let position = Math.abs(this._position);
 		for(let i=0; i<this._elements.length; i++) {
+			
 			let elPosition = Math.round($(this._elements[i]).position().left)-this.getMarginX();
 			elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-			if(elPosition === -this._position)
-			{
-				bookmark = i;
+			if(elPosition===position) {
+				console.log("1")
+				console.log(this._elements[i]);
+				console.log("position   " + position);
+				console.log("elposition   " + elPosition);
+				this._bookmark = i;
+				break;
+			} else if(elPosition > position) {
+				console.log("-1")
+				console.log(this._elements[i-1]);
+				console.log("position   " + position);
+				console.log("elposition   " + elPosition);
+				this._bookmark = i-1;
 				break;
 			}
-			else if(elPosition > -this._position)
-			{
-				bookmark = i-1;
-				break;
-			}
+			
 		}
-		this._bookmark = bookmark;
 	}
 
-	goToBookmark(bookmark) {
+	goToBookmark() {
 		let element = this._elements[this._bookmark];
 		//position : offsetLeft of element relative to text
 		let position = Math.round($(element).position().left)-this.getMarginX();
