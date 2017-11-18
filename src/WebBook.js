@@ -1,4 +1,5 @@
-import $ from 'jquery';
+import $ from 'jquery/src/core';
+import 'jquery/src/offset';
 
 export default class WebBook {
 	constructor(bookContainer, options) {
@@ -22,10 +23,10 @@ export default class WebBook {
 		this._text.appendChild(this._lastBreak);
 		//this._lastElement is used as landmark
 		this._lastElement = document.createElement('DIV');
-		this._lastElement.innerHTML = 'nbsp;';//not empty (for mozColumns)
 		this._lastElement.className = 'wb-section wb-no-toc';
 		this._lastElement.id = 'last';
 		let p = document.createElement('P');
+		p.innerHTML = '&nbsp;';//not empty (for mozColumns)
 		this._lastElement.appendChild(p);
 		this._text.appendChild(this._lastElement);
 		//sections
@@ -313,13 +314,13 @@ export default class WebBook {
 		//this._position/this._containerWidth is start of a page : start 0 is page 1,... (so : +1)
 		let pageNumber = Math.abs(Math.floor(this._position/this._containerWidth))+1;
 		//this._startPage (pagination start)
-		pageNumber = pageNumber-(this._startPage);
+		pageNumber = pageNumber-this._startPage;
 		return pageNumber;
 	}
 
 	getTotalPages() {
 		let totalPages = Math.floor(Math.round($(this._lastElement).position().left)/this._containerWidth);
-		totalPages = totalPages-(this._startPage);
+		totalPages = totalPages-this._startPage;
 		return totalPages;
 	}
 
