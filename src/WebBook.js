@@ -42,8 +42,6 @@ export default class WebBook {
 		this._breaks = this._text.querySelectorAll('.wb-text-break');
 		//elements : select all elements but .text-breaks (for bookmarks)
 		this._elements = this._text.querySelectorAll(':not(.wb-text-break)');
-		//all elements inside sections (for bookmark)
-		this._elements_all = this._text.querySelectorAll('.wb-section *');
 		//toc
 		this._tocs = this._bookContainer.querySelectorAll('[data-wb-toc]');
 		//getTocs before querying this.elPageNumbers
@@ -442,23 +440,34 @@ export default class WebBook {
 	}
 
 	insertBookmark() {
-		let position = Math.abs(this._position);
-		let elPosition;
-		for(let i=0; i<this._elements_all.length; i++) {
-			let elPosition = Math.round($(this._elements_all[i]).position().left)-this.getMarginX();
-			elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-			if(elPosition===position) {
-				this._bookmark = i;
-				break;
-			} else if(elPosition > position) {
-				this._bookmark = i-1;
-				break;
+		//get current section
+		let sections = [].slice.call(this._sections);
+		let _this = this;
+		let doneSections = sections.filter(function(section) {
+			return _this.elementPageNumber(section.id) <= _this.getPageNumber(); 
+		});
+		let currentSection = doneSections[doneSections.length-1];
+		if(currentSection) {
+			let elements = document.querySelectorAll('#' + currentSection.id + ' *');
+			let position = Math.abs(this._position);
+			let elPosition;
+			for(let i=0; i<elements.length; i++) {
+				let elPosition = Math.round($(elements[i]).position().left)-this.getMarginX();
+				elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+				if(elPosition===position) {
+					this._bookmark = { sectionId: currentSection.id, el: i };
+					break;
+				} else if(elPosition > position) {
+					this._bookmark = { section: currentSection.id, el: i-1 };
+					break;
+				}
 			}
 		}
 	}
 
 	goToBookmark(bookmark) {
-		let el = this._elements_all[bookmark];
+		let els = this._text.querySelectorAll('#' + bookmark.sectionId + ' *');
+		let el = els[bookmark.el];
 		//position : offsetLeft of element relative to text
 		let position = Math.round($(el).position().left)-this.getMarginX();
 		position = (position%this._containerWidth!==0 ? position-position%this._containerWidth : position);//always at a page beginning
