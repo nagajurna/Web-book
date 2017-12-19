@@ -4,6 +4,7 @@
   "description": "mise en page style e-book",
   "main": "dist/webBook.js",
   "scripts": {
+	"start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack"
   },
@@ -31,5 +32,10 @@
     "uglifyjs-webpack-plugin": "1.0.1",
     "webpack": "3.8.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "engines": {
+    "node": "6.4.0"
+  }
 }

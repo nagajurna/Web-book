@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>Web-book</title>
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link href='/css/normalize.css' rel='stylesheet' type='text/css'>
+		<link href='/css/style.css' rel='stylesheet' type='text/css'>
+<!--
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+-->
+		<script src="https://www.promisejs.org/polyfills/promise-7.0.4.min.js"></script>
+		<script src="/js/main.js"></script>
+	</head>
+	<body>
+
+<!--
+		START BOOKCONTAINER
+-->
+		<div id="bookContainer">
+<!--
+			NAVBAR-TOP : width >= 768	 
+-->
+			<div id="nav-bar-top" class="w3-bar w3-white w3-border-bottom w3-large">
+				  <a href="#" class="w3-bar-item w3-button">WB</a>
+			</div>
+<!--
+			NAVBAR-BOTTOM (outside textContainer) : width >= 768			
+-->
+			<div id="nav-bar-bottom" class="w3-bottom">
+			  <div class="w3-bar w3-large">
+				  <div id="swing-bar">
+					  <div id="nav-bar-bottom-controls">
+						  <button id="first" type="button" class="w3-btn w3-margin-right"><i class="fa fa fa-step-backward"></i></button>
+						  <button id="backward-large" type="button" class="w3-btn w3-margin-right"><i class="fa fa-caret-left"></i></button>
+						  <button id="forward-large" type="button" class="w3-btn w3-margin-left"><i class="fa fa-caret-right"></i></button>
+						  <button id="open-toc-large" class="open-toc w3-btn" type="button" ><i class="fa fa-th-list"></i></button>
+						  <button id="last" type="button" class="w3-btn w3-margin-right"><i class="fa fa-step-forward"></i></button>
+					  </div>
+				  </div>		  
+			  </div>
+			</div>
+<!--
+			TOC-LARGE-DEVICE (outside textContainer) : width >= 1366
+-->
+			<div id="toc-large-device" class="w3-card-4">
+				<button type="button" id="toggle-toc-large-device" class="w3-btn w3-card-4 w3-white"><i class="fa fa-bars"></i></button>
+				<div>
+					<div data-wb-toc="Sommaire" class="w3-container"></div>
+				</div>
+			</div>
+			
+<!--
+			START SWING-CONTAINER : margin-left: 33% WHEN TOC-LARGE OPEN
+-->
+			<div id="swing-container">
+<!--
+				START TEXT-CONTAINER
+-->
+				<div data-wb-text-container class="w3-card-4">
+<!--
+					TOC (inside textContainer) : width < 1366
+-->
+					<div id="toc">
+						<div data-wb-toc="Sommaire" class="w3-card-4 w3-container">
+							<button type="button" id="close-toc"><i class="fa fa-close"></i></button>
+						</div>
+					</div>
+<!--
+					TOP (inside textContainer)
+-->
+					<div id="top">
+						<span class="wb-current-section-title"></span>
+					</div>
+<!--
+					BOTTOM (inside textContainer) : width < 768
+-->
+					<div id="bottom">
+						<button id="backward" type="button"><i class="fa fa-caret-left"></i></button>
+						<span class="wb-currentByTotal-pages"></span>
+						<button id="forward" type="button"><i class="fa fa-caret-right"></i></button>
+						<button class="open-toc" type="button"><i class="fa fa-th-list"></i></button>
+					</div>
+<!--
+					BOTTOM-LARGE (inside textContainer) : width >= 768
+-->
+					<div id="bottom-large">
+						<span class="wb-currentByTotal-pages"></span>
+					</div>
+<!--
+					START TEXT
+-->
+					<div data-wb-text></div>					
+<!--
+					END TEXT
+-->
+					
+<!--
+				END TEXTCONTAINER
+-->
+				</div>
+<!--
+			END SWINGCONTAINER
+-->
+			</div>
+<!--
+		END BOOKCONTAINER
+-->
+		</div>
+		
+		<script src="/dist/web-book.min.js"></script>
+	</body>
+</html>

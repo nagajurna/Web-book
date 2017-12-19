@@ -3,7 +3,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 module.exports = {
   entry: './src/entry.js',
   output: {
-    filename: './dist/web-book.min.js',
+    filename: './public/dist/web-book.min.js',
     library: 'WebBook',
     libraryTarget: 'var'
   },
