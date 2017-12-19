@@ -87,6 +87,10 @@ export default class WebBook {
 						this._elPageNumbers[i].innerHTML = pageNumber;
 					}
 				}
+				
+				if(this._text.querySelectorAll('.wb-section').length > 2) {
+					this._text.innerHTML = '';
+				}
 					
 				if(this._bookmark) {
 					this.goToBookmark(this._bookmark);
