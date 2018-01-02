@@ -244,6 +244,14 @@ toc list
 	float: right;
 }
 
+[data-wb-toc] .level1 {
+	text-transform: uppercase;
+}
+
+[data-wb-toc] .level2 {
+	font-variant: small-caps;
+}
+
 
 /*
 TOP

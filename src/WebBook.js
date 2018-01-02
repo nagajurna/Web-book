@@ -30,21 +30,28 @@ export default class WebBook {
 		this._lastElement.appendChild(p);
 		//options text
 		this._div = document.createElement("DIV");
+		this._div.id = 'wb_div';
 		this._div.innerHTML = options.text;
 		this._div.appendChild(this._lastElement);
+		//div container
+		this._divContainer = document.createElement('DIV');
+		this._divContainer.appendChild(this._div);
 		//SECTIONS
-		this._sections = this._div.querySelectorAll('.wb-section');
+		//main sections
+		this._sections = this._divContainer.querySelectorAll('#wb_div > .wb-section');
+		//main sections + nested sections
+		this._sectionsToc = this._div.querySelectorAll('.wb-section');
+		//sections without wb-no-toc
+		this._tocSections = []
+		for(let i=0; i<this._sectionsToc.length; i++) {
+			if(!this._sectionsToc[i].className.match(/wb-no-toc/)) {
+				this._tocSections.push(this._sectionsToc[i]);
+			}
+		}
 		//TOCS CONTAINER + TOCS INIT
 		this._tocs = this._bookContainer.querySelectorAll('[data-wb-toc]');
 		//getTocs before querying this.elPageNumbers
 		this.getTocs();
-		//sections without wb-no-toc
-		this._tocSections = []
-		for(let i=0; i<this._sections.length; i++) {
-			if(!this._sections[i].className.match(/wb-no-toc/)) {
-				this._tocSections.push(this._sections[i]);
-			}
-		}
 		//INFOS CONTAINERS
 		this._currentPages = this._bookContainer.querySelectorAll('.wb-current-page');
 		this._totalPages = this._bookContainer.querySelectorAll('.wb-total-pages');
@@ -87,10 +94,6 @@ export default class WebBook {
 						this._elPageNumbers[i].innerHTML = pageNumber;
 					}
 				}
-				
-				if(this._text.querySelectorAll('.wb-section').length > 2) {
-					this._text.innerHTML = '';
-				}
 					
 				if(this._bookmark) {
 					this.goToBookmark(this._bookmark);
@@ -113,12 +116,14 @@ export default class WebBook {
 	}
 
 	toBook() {
-					
-		for(let i=0; i<this._sections.length; i++) {
-			this._sections[i].style.marginBottom = "300%";
+		let sections = this._text.querySelectorAll('.wb-section');			
+		for(let i=0; i<sections.length; i++) {
+			if(!sections[i].className.match(/wb-no-break/)) {//possibly, for nested sections
+				sections[i].style.marginBottom = "300%";
+			}
 			//hack firefox (pour offsetLeft) : minHeight = 10%
-			if(this._sections[i].style.minHeight!=="10%") {
-				this._sections[i].style.minHeight = "10%";
+			if(sections[i].style.minHeight!=="10%") {
+				sections[i].style.minHeight = "10%";
 			}
 		}
 							
@@ -192,10 +197,6 @@ export default class WebBook {
 		//Sections (for mozColumns)
 		for(let i=0; i<this._sections.length; i++) {
 			this._sections[i].style.minHeight = "0";
-		}
-		//manual breaks
-		for(let i=0; i<this._breaks.length; i++) {
-			this._breaks[i].style.marginBottom = "0";
 		}
 		//last element
 		this._lastElement.style.marginBottom = "0px";
@@ -281,9 +282,7 @@ export default class WebBook {
 		if(this._sections[index].id==='wb-last') { return; }
 		this._sectionsIndex = index;
 		this._text.innerHTML = '';
-		//this._sections[this._sectionsIndex].style.marginBottom = "300%";
 		this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
-		//this._lastElement.marginBottom = "300%";
 		this._text.appendChild(this._lastElement.cloneNode(true));
 		this.setSectionLinks();
 		this.toBook();
@@ -296,9 +295,7 @@ export default class WebBook {
 		if(index<0) { return; }
 		this._sectionsIndex = index;
 		this._text.innerHTML = '';
-		//this._sections[this._sectionsIndex].style.marginBottom = "300%";
 		this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
-		//this._lastElement.marginBottom = "300%";
 		this._text.appendChild(this._lastElement.cloneNode(true));
 		this.setSectionLinks();
 		this.toBook();
@@ -315,9 +312,7 @@ export default class WebBook {
 				this._sectionsIndex = i;
 				if(this._sections[this._sectionsIndex].id!==this._text.querySelectorAll('.wb-section')[0].id) {
 					this._text.innerHTML = '';
-					this._sections[this._sectionsIndex].style.marginBottom = this._sections[this._sectionsIndex].className.match(/wb-break/) ? "300%" : "0%";
 					this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
-					this._lastElement.marginBottom = "300%";
 					this._text.appendChild(this._lastElement.cloneNode(true));
 					this.setSectionLinks();
 					this.toBook();
@@ -434,13 +429,35 @@ export default class WebBook {
 	}
 
 	getSectionTitle() {
-		let title;
-		let sections = this._text.querySelectorAll('.wb-section');
-		if(this.getPageNumber()==1) {
-			title = "";
-		} else {
-			title = sections[0].getAttribute('data-wb-title') ? sections[0].getAttribute('data-wb-title') : sections[0].title;
+		let title = "";
+		let section = this._text.querySelectorAll('.wb-section')[0];
+		if(section.querySelectorAll('.wb-section').length!==0 && this._text.querySelectorAll('.wb-section-title').length!==0) {//nested sections
+			let sects = this._text.querySelectorAll('.wb-section-title');
+			let sections = [].slice.call(sects);
+			sections.push(this._lastElement);
+			for(let i=0; i<sections.length; i++) {
+				let id = sections[i].id;
+				if(this.getPageNumber()<(this.elementPageNumber(id)+this._startPage)) {
+					if(this.getPageNumber()===(this.elementPageNumber(sections[i-1].id)+this._startPage)) {
+						title = "";
+					} else {
+						title = sections[i-1].getAttribute('data-wb-title') ? sections[i-1].getAttribute('data-wb-title') : sections[i-1].title;
+					}
+					break;
+				}
+			}
+		} else {//non nested sections
+			if(this.getPageNumber()==1) {
+				title = "";
+			} else {
+				if(!section.className.match(/wb-no-title/)) {
+					title = section.getAttribute('data-wb-title') ? section.getAttribute('data-wb-title') : section.title;
+				} else {
+					title = "";
+				}
+			}
 		}
+		
 		return title;
 	}
 	
@@ -458,32 +475,30 @@ export default class WebBook {
 			let content = document.createElement('div');
 			let list = document.createElement('ul');
 			list.setAttribute('class','wb-toc-list');
-			for(let i=0; i<this._sections.length; i++) {
-				let section = this._sections[i];
-				if(!section.className.match(/wb-no-toc/)) {
-					let item = document.createElement('li');
-					item.setAttribute('class','wb-toc-item');
-					if(!section.className.match(/wb-toc-no-page-number/)) {
-						let link = document.createElement('a');
-						link.setAttribute('href', '#' + section.id);
-						link.setAttribute('class', 'wb-link');
-						item.appendChild(link);
-						let title = document.createElement('span');
-						title.setAttribute('class','wb-toc-item-title');
-						title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
-						link.appendChild(title);
-						let page = document.createElement('span');
-						page.setAttribute('class','wb-toc-item-page-number');	
-						page.setAttribute('data-wb-element-page-number', section.id);
-						link.appendChild(page);
-					} else {
-						let title = document.createElement('span');
-						title.setAttribute('class','wb-toc-item-title');
-						title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
-						item.appendChild(title);
-					}
-					list.appendChild(item);
+			for(let i=0; i<this._tocSections.length; i++) {
+				let section = this._tocSections[i];
+				let item = document.createElement('li');
+				item.setAttribute('class','wb-toc-item');
+				let link = document.createElement('a');
+				link.setAttribute('href', '#' + section.id);
+				link.setAttribute('class', 'wb-link');
+				item.appendChild(link);
+				let title = document.createElement('span');
+				if(section.getAttribute('data-wb-class')) {
+					title.setAttribute('class','wb-toc-item-title ' + section.getAttribute('data-wb-class'));
+				} else {
+					title.setAttribute('class','wb-toc-item-title');
 				}
+				title.innerHTML = section.getAttribute('data-wb-title-toc') ? section.getAttribute('data-wb-title-toc') : section.title;
+				link.appendChild(title);
+				if(!section.className.match(/wb-toc-no-page-number/)) {
+					let page = document.createElement('span');
+					page.setAttribute('class','wb-toc-item-page-number');	
+					page.setAttribute('data-wb-element-page-number', section.id);
+					link.appendChild(page);
+				}
+				list.appendChild(item);
+				
 			}
 			content.appendChild(list);
 			toc.appendChild(content);
@@ -503,7 +518,23 @@ export default class WebBook {
 	}
 	
 	getTocsCurrentSection() {
-		let currentSection = this._text.querySelectorAll('.wb-section')[0];
+		let currentSection;
+		let section = this._text.querySelectorAll('.wb-section')[0];
+		if(section.querySelectorAll('.wb-section').length!==0) {//nested sections
+			let sects = this._text.querySelectorAll('.wb-section');
+			let sections = [].slice.call(sects);
+			sections.push(this._lastElement);
+			for(let i=0; i<sections.length; i++) {
+				let id = sections[i].id;
+				if(this.getPageNumber()<(this.elementPageNumber(id)+this._startPage)) {
+					currentSection = sections[i-1];
+					break;
+				}
+			}
+		} else {//non-nested sections
+			currentSection = section;
+		}
+		
 		if(currentSection) {
 			for(let i=0; i<this._tocs.length; i++) {
 				let toc = this._tocs[i];
@@ -524,7 +555,7 @@ export default class WebBook {
 	insertBookmark() {
 		let currentSection = this._text.querySelectorAll('.wb-section')[0];
 		if(currentSection) {
-			let elements = currentSection.querySelectorAll('*');
+			let elements = currentSection.querySelectorAll(':not(.wb-section)');
 			let position = Math.abs(this._position);
 			let elPosition;
 			for(let i=0; i<elements.length; i++) {
@@ -548,18 +579,18 @@ export default class WebBook {
 	goToBookmark(bookmark) {	
 		for(let i=0; i<this._sections.length; i++) {
 			if(this._sections[i].id===bookmark.sectionId) {
-				if(this._sections[i].id!==this._text.querySelectorAll('.wb-section')[0].id) {
+				//if(this._sections[i].id!==this._text.querySelectorAll('.wb-section')[0].id) {
 					this._sectionsIndex = i;
 					this._text.innerHTML = '';
-					this._sections[this._sectionsIndex].style.marginBottom = "300%";
+					//this._sections[this._sectionsIndex].style.marginBottom = "300%";
 					this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
-					this._lastElement.marginBottom = "300%";
+					//this._lastElement.marginBottom = "300%";
 					this._text.appendChild(this._lastElement.cloneNode(true));
 					this.setSectionLinks();
 					this.toBook();
-				}
+				//}
 				let currentSection = this._text.querySelectorAll('.wb-section')[0];
-				let elements = currentSection.querySelectorAll('*');
+				let elements = currentSection.querySelectorAll(':not(.wb-section)');
 				let element = elements[bookmark.el];
 				//position : offsetLeft of element relative to text
 				let position = Math.round($(element).position().left)-this.getMarginX();

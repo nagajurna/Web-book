@@ -33,7 +33,7 @@ window.addEventListener('load', function() {
 		return promise;
 	}
 	
-	ajax({ method: 'GET', url: '/books/my_text.html' })
+	ajax({ method: 'GET', url: '/books/my_text2.html' })
 	.then( function(content) {
 		init(content);
 	})
@@ -63,6 +63,7 @@ window.addEventListener('load', function() {
 		var book = new WebBook(bookContainer, {
 			 height: h,
 			 maxWidth: w,
+			 marginX: 45,
 			 marginY: 45,
 			 text: text });
 		 
