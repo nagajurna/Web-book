@@ -63,50 +63,83 @@ export default class WebBook {
 		this.setBookLinks();
 	}
 	
-	init() {
+	init(infos) {
 		let promise = new Promise( (resolve,reject) => {
 			if('webkitColumnWidth' in document.body.style || 'mozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
 				
-				this._text.innerHTML = ''
-				this._text.appendChild(this._div);
+				let sections = this._sectionsToc;
+				//sections breaks			
+				for(let i=0; i<sections.length; i++) {
+					sections[i].style.display='none';
+					if(!sections[i].className.match(/wb-no-break/) && sections[i].style.marginBottom!=="300%") {//possibly, for nested sections
+						sections[i].style.marginBottom = "300%";
+					}
+					//hack firefox (pour offsetLeft) : minHeight = 10%
+					if(sections[i].style.minHeight!=="10%" && sections[i].style.minHeight!=="10%") {
+						sections[i].style.minHeight = "10%";
+					}
+					sections[i].style.display='block';
+				}
 				
-				this.toBook();
+				this._text.style.display = 'none';
+				
+				if(this._tableInfos===undefined || this._tableInfos.totalPages===null) {
+					this.emptyNode(this._text);
+					this._text.appendChild(this._div);
+				
+					this.toBook();
 					
-				setTimeout( () => {
 					//pagination start
-					this.getPageStart();
+					this._startPage = this.getPageStart();
 					//book total number of pages
 					this.pages_total = this.getBookTotalPages();
 					//array : for each section, starting page;
 					this._sections_page_start = [];
-					for(let i=0; i<this._sections.length; i++) {
+					this._toc_sections_page_start = [];
+					for(let i=0; i<sections.length; i++) {
 						let item = {};
-						item.id = this._sections[i].id;
+						item.id = sections[i].id;
 						item.page_start = this.elementPageNumber(item.id);
-						this._sections_page_start.push(item);
-					}
-						
-					//containers data-wb-element-page-number
-					for(let i=0; i<this._elPageNumbers.length; i++) {
-						let id = this._elPageNumbers[i].getAttribute('data-wb-element-page-number');
-						let pageNumber = this.elementPageNumber(id);
-						if(pageNumber < 1) {
-							this._elPageNumbers[i].innerHTML = "";
-						} else if(this._elPageNumbers[i].innerHTML!=pageNumber) {
-							this._elPageNumbers[i].innerHTML = pageNumber;
+						if(!sections[i].parentElement.className.match(/wb-section/)) {
+							this._sections_page_start.push(item);
 						}
+						this._toc_sections_page_start.push(item);
 					}
+				} else {
+					this._startPage = this._tableInfos.startPage;
+					this.pages_total = this._tableInfos.totalPages;
+					this._sections_page_start = this._tableInfos.sectionsPageStart;
+					this._toc_sections_page_start = this._tableInfos.tocSectionsPageStart;
+				}
 						
-					if(this._bookmark) {
-						this.goToBookmark(this._bookmark);
-						this._position = Math.round($(this._text).position().left);
-					} else {
-						this.nextSection(this._sectionsIndex);
-					}
-					this.refresh();
+				//containers data-wb-element-page-number
+				for(let i=0; i<this._elPageNumbers.length; i++) {
+					let id = this._elPageNumbers[i].getAttribute('data-wb-element-page-number');
+					let pageNumber = this._toc_sections_page_start.filter( o => {
+							return o.id===id;
+						})[0].page_start;
 					
-					resolve('book done');
-				},0);
+					if(pageNumber < 1) {
+						this._elPageNumbers[i].innerHTML = "";
+					} else if(this._elPageNumbers[i].innerHTML!=pageNumber) {
+						this._elPageNumbers[i].innerHTML = pageNumber;
+					}
+				}
+						
+				if(this._bookmark) {
+					this.goToBookmark(this._bookmark);
+					this._position = Math.round($(this._text).position().left);
+				} else {
+					this.nextSection(this._sectionsIndex);
+				}
+				this.refresh();
+				this._text.style.display = 'block';
+				let tableInfos = { startPage: this._startPage, 
+							  totalPages: this.pages_total, 
+							  sectionsPageStart: this._sections_page_start,
+							  tocSectionsPageStart: this._toc_sections_page_start };
+				resolve(tableInfos);
+				
 			
 			} else {
 				
@@ -118,30 +151,14 @@ export default class WebBook {
 		return promise;
 	}
 
-	toBook() {
-		let sections = this._text.querySelectorAll('.wb-section');			
-		for(let i=0; i<sections.length; i++) {
-			if(!sections[i].className.match(/wb-no-break/)) {//possibly, for nested sections
-				sections[i].style.marginBottom = "300%";
-			}
-			//hack firefox (pour offsetLeft) : minHeight = 10%
-			if(sections[i].style.minHeight!=="10%") {
-				sections[i].style.minHeight = "10%";
-			}
-		}
-							
-		let cs = this._textContainer.style;
-		let ts = this._text.style;
-		
-		if(ts.webkitColumns!=='auto auto' || ts.mozColumns!=='auto auto' || ts.columns!=='auto auto') {
-			ts.webkitColumns = 'auto auto';
-			ts.mozColumns = 'auto auto';
-			ts.columns = 'auto auto';
-		}		
-					
+	toBook() {		
 		this.col = true;
-	
+		let marginX = this.getMarginX();
+		let marginY = this.getMarginY();
+		
 		//text-container
+		let cs = this._textContainer.style;
+		cs.display = "none";
 		cs.boxSizing = "border-box";
 		cs.webkitBoxSizing = "border-box";
 		cs.overflow = "hidden";
@@ -149,9 +166,11 @@ export default class WebBook {
 		cs.padding = "0px";
 		cs.height = this.getHeight() + "px";
 		cs.maxWidth = this.getMaxWidth() + "px";//maxWidth : responsive
+		cs.display = "block";
 		this._containerWidth = this._textContainer.clientWidth;//responsive
-
 		//text
+		let ts = this._text.style;
+		ts.display = "none";
 		ts.boxSizing = "border-box";
 		ts.webkitBoxSizing = "border-box";
 		ts.position = "absolute";
@@ -159,62 +178,64 @@ export default class WebBook {
 		ts.top = 0;	
 		ts.height = "100%";
 		ts.width = "100%";
-		ts.paddingRight = this.getMarginX() + "px";
-		ts.paddingLeft = this.getMarginX() + "px";
-		ts.paddingTop = this.getMarginY() + "px";
-		ts.paddingBottom = this.getMarginY() + "px";
+		ts.paddingRight = marginX + "px";
+		ts.paddingLeft = marginX + "px";
+		ts.paddingTop = marginY + "px";
+		ts.paddingBottom = marginY + "px";
+		ts.webkitColumnFill = "auto";//important !!!
 		ts.mozColumnFill = "auto";//important !!!
 		ts.columnFill = "auto";//important !!!		
 		ts.webkitColumnWidth = this._containerWidth + "px";
 		ts.mozColumnWidth = this._containerWidth + "px";
 		ts.columnWidth = this._containerWidth + "px";
-		ts.mozColumnGap = this.getMarginX()*2 + "px";
-		ts.webkitColumnGap = this.getMarginX()*2 + "px";
-		ts.columnGap = this.getMarginX()*2 + "px";
+		ts.mozColumnGap = marginX*2 + "px";
+		ts.webkitColumnGap = marginX*2 + "px";
+		ts.columnGap = marginX*2 + "px";
+		ts.display = "block";
 	}
 
-	toScroll() {
-		'use strict';
-		this.col = false;
-		let cs = this._textContainer.style;
-		let ts = this._text.style;
-		//container
-		cs.height = "auto";
-		cs.maxWidth = this.getMaxWidth() + "px";
-		cs.overflow = "visible";
-		//text
-		ts.position = "static";
-		ts.height = "auto";
-		cs.paddingRight = this.getMarginX() + "px";
-		cs.paddingLeft = this.getMarginX() + "px";
-		cs.paddingTop = this.getMarginY() + "px";
-		cs.paddingBottom = this.getMarginY() + "px";
+	//toScroll() {
+		//'use strict';
+		//this.col = false;
+		//let cs = this._textContainer.style;
+		//let ts = this._text.style;
+		////container
+		//cs.height = "auto";
+		//cs.maxWidth = this.getMaxWidth() + "px";
+		//cs.overflow = "visible";
+		////text
+		//ts.position = "static";
+		//ts.height = "auto";
+		//cs.paddingRight = this.getMarginX() + "px";
+		//cs.paddingLeft = this.getMarginX() + "px";
+		//cs.paddingTop = this.getMarginY() + "px";
+		//cs.paddingBottom = this.getMarginY() + "px";
 
-		if('webkitColumnWidth' in document.body.style || 'mozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
-			ts.webkitColumns = "auto auto";
-			ts.mozColumns = "auto auto";
-			ts.columns = "auto auto";
-		}
+		//if('webkitColumnWidth' in document.body.style || 'mozColumnWidth' in document.body.style || 'columnWidth'  in document.body.style) {
+			//ts.webkitColumns = "auto auto";
+			//ts.mozColumns = "auto auto";
+			//ts.columns = "auto auto";
+		//}
 		
 
-		//Sections (for mozColumns)
-		for(let i=0; i<this._sections.length; i++) {
-			this._sections[i].style.minHeight = "0";
-		}
-		//last element
-		this._lastElement.style.marginBottom = "0px";
+		////Sections (for mozColumns)
+		//for(let i=0; i<this._sections.length; i++) {
+			//this._sections[i].style.minHeight = "0";
+		//}
+		////last element
+		//this._lastElement.style.marginBottom = "0px";
 		
-		//wb-total-pages empty
-		for(let i=0; i<this._totalPages.length; i++) {
-			this._totalPages[i].innerHTML = "";
-		}
-		//data-wb-element-page-number empty
-		for(let i=0; i<this._elPageNumbers.length; i++) {
-			this._elPageNumbers[i].innerHTML = "";
-		}
+		////wb-total-pages empty
+		//for(let i=0; i<this._totalPages.length; i++) {
+			//this._totalPages[i].innerHTML = "";
+		//}
+		////data-wb-element-page-number empty
+		//for(let i=0; i<this._elPageNumbers.length; i++) {
+			//this._elPageNumbers[i].innerHTML = "";
+		//}
 
-		this.refresh();
-	};
+		//this.refresh();
+	//};
 
 	setMaxWidth(w) {
 		this._width = w;
@@ -252,6 +273,14 @@ export default class WebBook {
 		return this._marginY;
 	}
 	
+	emptyNode(el) {
+		var child = el.firstChild;
+		while(child) {
+			el.removeChild(child);
+			child = el.firstChild;
+		}
+	}
+	
 	setBookLinks() {
 		let links = this._bookContainer.querySelectorAll('.wb-link');
 		for(let i=0; i<links.length; i++) {
@@ -284,11 +313,13 @@ export default class WebBook {
 	nextSection(index) {
 		if(this._sections[index].id==='wb-last') { return; }
 		this._sectionsIndex = index;
-		this._text.innerHTML = '';
+		this.emptyNode(this._text);
 		this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
 		this._text.appendChild(this._lastElement.cloneNode(true));
 		this.setSectionLinks();
-		this.toBook();
+		if(this._tableInfos) {
+			this.toBook();
+		}
 		this._position = 0;
 		this._text.style.left = this._position + "px";
 		this.refresh();
@@ -297,11 +328,13 @@ export default class WebBook {
 	prevSection(index) {
 		if(index<0) { return; }
 		this._sectionsIndex = index;
-		this._text.innerHTML = '';
+		this.emptyNode(this._text);
 		this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
 		this._text.appendChild(this._lastElement.cloneNode(true));
 		this.setSectionLinks();
-		this.toBook();
+		if(this._tableInfos) {
+			this.toBook();
+		}
 		this.goToPage(this.getSectionTotalPages()-this._startPage);
 		this.refresh();
 	}
@@ -314,11 +347,13 @@ export default class WebBook {
 			} else if(this._sections[i].querySelector('#' + id)) {
 				this._sectionsIndex = i;
 				if(this._sections[this._sectionsIndex].id!==this._text.querySelectorAll('.wb-section')[0].id) {
-					this._text.innerHTML = '';
+					this.emptyNode(this._text);
 					this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
 					this._text.appendChild(this._lastElement.cloneNode(true));
 					this.setSectionLinks();
-					this.toBook();
+					if(this._tableInfos) {
+						this.toBook();
+					}
 				}
 				this.goToPage(this.elementPageNumber(id));
 				this.refresh();
@@ -365,21 +400,26 @@ export default class WebBook {
 	}
 	
 	getPageStart() {
-		let index, startIndex;
+		let index, startIndex, startPage;
 		for(let i=0; i< this._sections.length; i++) {
 			if(this._sections[i] && this._sections[i].className.match(/wb-no-page/)) {
 				index = i;
 			} else {
 				if(index!==undefined && startIndex===undefined) {
-					startIndex = i;
-					let id = this._sections[startIndex].id;
-					let el = this._text.querySelector('#' + id + ' p:first-child');
-					let elPosition = Math.round($(el).position().left) - this.getMarginX();
-					elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
-					this._startPage = elPosition/this._containerWidth;
+					if(!this._sections[i].className.match(/wb-no-page/)) {
+						startIndex = i;
+						let id = this._sections[startIndex].id;
+						let el = this._text.querySelector('#' + id + ' p:first-child');
+						let elPosition = Math.round($(el).position().left) - this.getMarginX();
+						elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+						startPage = elPosition/this._containerWidth;
+						break;
+					}
 				}
 			}
 		}
+		startPage = startPage ? startPage : 0;
+		return startPage;
 	}
 	
 	checkFirstPage() {
@@ -415,6 +455,12 @@ export default class WebBook {
 		this._text.style.left = -position + "px";
 		this._position = Math.round($(this._text).position().left);
 	}
+	
+	getElementPosition(element) {
+		let pos = Math.round($(element).position().left)-this.getMarginX();
+		pos = (pos%this._containerWidth!==0 ? pos-pos%this._containerWidth : pos);//always at a page beginning
+		return pos;
+	}
 
 	elementPageNumber(id) {
 		let el;
@@ -424,8 +470,7 @@ export default class WebBook {
 			el = this._text.querySelector('#' + id);
 		}
 		if(!el) { return ''; }
-		let elPosition = Math.round($(el).position().left) - this.getMarginX();
-		elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+		let elPosition = this.getElementPosition(el);
 		let elPageNumber = (elPosition/this._containerWidth) + 1;//elPosition/this._containerWidth is position of a page : position 0 is page 1,...
 		elPageNumber = elPageNumber-(this._startPage);
 		return elPageNumber;
@@ -524,7 +569,7 @@ export default class WebBook {
 		let currentSection;
 		let section = this._text.querySelectorAll('.wb-section')[0];
 		if(section.querySelectorAll('.wb-section').length!==0) {//nested sections
-			let sects = this._text.querySelectorAll('.wb-active-section');
+			let sects = this._text.querySelectorAll('[data-wb-active-section]');
 			let sections = [].slice.call(sects);
 			sections.push(this._lastElement);
 			for(let i=0; i<sections.length; i++) {
@@ -543,7 +588,8 @@ export default class WebBook {
 				let toc = this._tocs[i];
 				let links = toc.querySelectorAll('a');
 				for(let j=0; j<links.length; j++) {
-					if(links[j].getAttribute('href').replace(/^#/,'')===currentSection.id) {
+					let id = currentSection.getAttribute('data-wb-active-section') ? currentSection.getAttribute('data-wb-active-section') : currentSection.id;
+					if(links[j].getAttribute('href').replace(/^#/,'')===id) {
 						if(!links[j].parentElement.className.match(/current/)) {
 							links[j].parentElement.className+=' current';
 						}
@@ -562,8 +608,7 @@ export default class WebBook {
 			let position = Math.abs(this._position);
 			let elPosition;
 			for(let i=0; i<elements.length; i++) {
-				let elPosition = Math.round($(elements[i]).position().left)-this.getMarginX();
-				elPosition = (elPosition%this._containerWidth!==0 ? elPosition-elPosition%this._containerWidth : elPosition);//always at a page beginning
+				let elPosition = this.getElementPosition(elements[i]);
 				if(elPosition===position) {
 					if(currentSection.id==='wb-last') {
 						this._bookmark = { sectionId: currentSection.id, el: elements.length-1 };
@@ -582,22 +627,21 @@ export default class WebBook {
 	goToBookmark(bookmark) {	
 		for(let i=0; i<this._sections.length; i++) {
 			if(this._sections[i].id===bookmark.sectionId) {
-				//if(this._sections[i].id!==this._text.querySelectorAll('.wb-section')[0].id) {
-					this._sectionsIndex = i;
-					this._text.innerHTML = '';
-					//this._sections[this._sectionsIndex].style.marginBottom = "300%";
-					this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
-					//this._lastElement.marginBottom = "300%";
-					this._text.appendChild(this._lastElement.cloneNode(true));
-					this.setSectionLinks();
-					this.toBook();
+				//if(i===0) { 
+					//this._position = Math.round($(this._text).position().left);
+					//return; 
 				//}
+				this._sectionsIndex = i;
+				this.emptyNode(this._text);
+				this._text.appendChild(this._sections[this._sectionsIndex].cloneNode(true));
+				this._text.appendChild(this._lastElement.cloneNode(true));
+				this.setSectionLinks();
+				this.toBook();
 				let currentSection = this._text.querySelectorAll('.wb-section')[0];
 				let elements = currentSection.querySelectorAll(':not(.wb-section)');
 				let element = elements[bookmark.el];
 				//position : offsetLeft of element relative to text
-				let position = Math.round($(element).position().left)-this.getMarginX();
-				position = (position%this._containerWidth!==0 ? position-position%this._containerWidth : position);//always at a page beginning
+				let position = this.getElementPosition(element);
 				//text position = -position
 				this._text.style.left = -position + "px";
 				this._position = Math.round($(this._text).position().left);
@@ -661,8 +705,7 @@ export default class WebBook {
 			}
 			//containers wbcurrentByTotal-pages
 			for(let i=0; i<this._currentTotalPages.length; i++) {
-				let sectionId = this.getParentSectionId();
-				let section = this._text.querySelectorAll('#' + sectionId)[0];
+				let section = this._text.querySelectorAll('.wb-section')[0];
 				let pageNumber = this._sections_page_start[this._sectionsIndex].page_start + this.getPageNumber()-1;
 				if(pageNumber < 1 || section.className.match(/wb-page-no-display/)) {
 					this._currentTotalPages[i].innerHTML = "";
