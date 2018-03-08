@@ -1,5 +1,6 @@
 import $ from 'jquery/src/core';
 import 'jquery/src/offset';
+import Promise from 'promise';
 
 export default class WebBook {
 	constructor(bookContainer, options) {
@@ -71,39 +72,41 @@ export default class WebBook {
 				
 				this.toBook();
 					
-				//pagination start
-				this.getPageStart();
-				//book total number of pages
-				this.pages_total = this.getBookTotalPages();
-				//array : for each section, starting page;
-				this._sections_page_start = [];
-				for(let i=0; i<this._sections.length; i++) {
-					let item = {};
-					item.id = this._sections[i].id;
-					item.page_start = this.elementPageNumber(item.id);
-					this._sections_page_start.push(item);
-				}
-					
-				//containers data-wb-element-page-number
-				for(let i=0; i<this._elPageNumbers.length; i++) {
-					let id = this._elPageNumbers[i].getAttribute('data-wb-element-page-number');
-					let pageNumber = this.elementPageNumber(id);
-					if(pageNumber < 1) {
-						this._elPageNumbers[i].innerHTML = "";
-					} else if(this._elPageNumbers[i].innerHTML!=pageNumber) {
-						this._elPageNumbers[i].innerHTML = pageNumber;
+				setTimeout( () => {
+					//pagination start
+					this.getPageStart();
+					//book total number of pages
+					this.pages_total = this.getBookTotalPages();
+					//array : for each section, starting page;
+					this._sections_page_start = [];
+					for(let i=0; i<this._sections.length; i++) {
+						let item = {};
+						item.id = this._sections[i].id;
+						item.page_start = this.elementPageNumber(item.id);
+						this._sections_page_start.push(item);
 					}
-				}
+						
+					//containers data-wb-element-page-number
+					for(let i=0; i<this._elPageNumbers.length; i++) {
+						let id = this._elPageNumbers[i].getAttribute('data-wb-element-page-number');
+						let pageNumber = this.elementPageNumber(id);
+						if(pageNumber < 1) {
+							this._elPageNumbers[i].innerHTML = "";
+						} else if(this._elPageNumbers[i].innerHTML!=pageNumber) {
+							this._elPageNumbers[i].innerHTML = pageNumber;
+						}
+					}
+						
+					if(this._bookmark) {
+						this.goToBookmark(this._bookmark);
+						this._position = Math.round($(this._text).position().left);
+					} else {
+						this.nextSection(this._sectionsIndex);
+					}
+					this.refresh();
 					
-				if(this._bookmark) {
-					this.goToBookmark(this._bookmark);
-					this._position = Math.round($(this._text).position().left);
-				} else {
-					this.nextSection(this._sectionsIndex);
-				}
-				this.refresh();
-				
-				resolve('book done');
+					resolve('book done');
+				},0);
 			
 			} else {
 				
@@ -521,7 +524,7 @@ export default class WebBook {
 		let currentSection;
 		let section = this._text.querySelectorAll('.wb-section')[0];
 		if(section.querySelectorAll('.wb-section').length!==0) {//nested sections
-			let sects = this._text.querySelectorAll('.wb-section');
+			let sects = this._text.querySelectorAll('.wb-active-section');
 			let sections = [].slice.call(sects);
 			sections.push(this._lastElement);
 			for(let i=0; i<sections.length; i++) {

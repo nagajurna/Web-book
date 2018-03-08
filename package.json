@@ -4,7 +4,7 @@
   "description": "mise en page style e-book",
   "main": "dist/webBook.js",
   "scripts": {
-	"start": "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack"
   },
@@ -28,6 +28,7 @@
     "babel-loader": "7.1.2",
     "babel-preset-env": "1.6.0",
     "jquery": "^3.2.1",
+    "promise": "^8.0.1",
     "uglify-js": "3.1.5",
     "uglifyjs-webpack-plugin": "1.0.1",
     "webpack": "3.8.1"
