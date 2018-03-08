@@ -325,7 +325,7 @@ TEXT
   background-color: transparent;
 }
 
-[data-wb-text].cover {
+[data-wb-text].cover_active {
   background-color: #dc4c46;
 }
 
