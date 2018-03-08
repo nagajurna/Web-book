@@ -33,7 +33,7 @@ window.addEventListener('load', function() {
 		return promise;
 	}
 	
-	ajax({ method: 'GET', url: '/books/my_text2.html' })
+	ajax({ method: 'GET', url: '/books/rene_leys.html' })
 	.then( function(content) {
 		init(content);
 	})
