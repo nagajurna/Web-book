@@ -244,6 +244,12 @@ toc list
 	float: right;
 }
 
+.wb-toc-list span.wb-toc-item-page-number {
+	display: inline-block;
+	width: 30px;
+	text-align: right;
+}
+
 [data-wb-toc] .level1 {
 	text-transform: uppercase;
 }
@@ -339,6 +345,20 @@ TEXT
 INSIDE TEXT
 */
 /*
+SECTIONS
+*/
+/*
+[data-wb-text] .wb-section {
+	margin-bottom: 300%;
+	min-height: 10%;
+}
+*/
+
+[data-wb-text] .wb-section.wb-no-break {
+	margin-bottom: 0%;
+	min-height: 10%;
+}
+/*
 TITLES
 */
 #cover {
@@ -361,6 +381,16 @@ p.section-title, p.notes-title, p.wb-toc-title {
 	font-size: 1.25em;
 	text-align: left;
 	text-indent: 0px;
+}
+
+[data-wb-text] p.separation {
+	text-indent: 0px;
+	text-align: center;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
+	line-height: 1em;
+	font-size: 0.8em;
+	page-break-inside: avoid;
 }
 
 p.wb-toc-title {
